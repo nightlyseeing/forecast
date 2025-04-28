@@ -9,7 +9,6 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; transition: background-color 0.3s; }
     tr:hover { background-color: #f1f1f1; }
-    th { background-color: #f4f4f4; position: sticky; top: 0; }
     .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
@@ -46,16 +45,6 @@
   </div>
 
   <table id="forecast">
-    <thead>
-      <tr>
-        <th>🕒 Čas</th>
-        <th>🌗 Den/Noc</th>
-        <th>🌡️ Teplota (°C)</th>
-        <th>☁️ Oblačnost (%)</th>
-        <th>🌧️ Srážky (mm)</th>
-        <th>💨 Vítr (km/h)</th>
-      </tr>
-    </thead>
     <tbody>
     </tbody>
   </table>
@@ -159,6 +148,19 @@
           dayRow.className = 'day-row';
           dayRow.innerHTML = `<td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">▶️ 📅 ${currentDay} - ${sunriseText} / ${sunsetText}</td>`;
           tbody.appendChild(dayRow);
+
+          // Přidat řádek s popisky
+          const headerRow = document.createElement('tr');
+          headerRow.className = `group-${group}`;
+          headerRow.innerHTML = `
+            <th>🕒 Čas</th>
+            <th>🌗 Den/Noc</th>
+            <th>🌡️ Teplota (°C)</th>
+            <th>☁️ Oblačnost (%)</th>
+            <th>🌧️ Srážky (mm)</th>
+            <th>💨 Vítr (km/h)</th>
+          `;
+          tbody.appendChild(headerRow);
         }
 
         let cloudClass = '';
