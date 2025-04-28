@@ -37,6 +37,7 @@
 <body>
   <h1>Astronomická předpověď</h1>
   <h2 id="cityDisplay"></h2>
+  <div id="loading" style="display:none; margin-bottom:10px;">⏳ Načítám polohu...</div>
 
   <div class="controls">
     <input type="text" id="cityInput" placeholder="Zadejte město (např. Praha)">
@@ -152,9 +153,11 @@
         if (dayName !== currentDay) {
           currentDay = dayName;
           group++;
+          const sunriseText = sunriseTimes[datePart] ? `Východ slunce ${sunriseTimes[datePart]}` : 'N/A';
+          const sunsetText = sunsetTimes[datePart] ? `Západ slunce ${sunsetTimes[datePart]}` : 'N/A';
           const dayRow = document.createElement('tr');
           dayRow.className = 'day-row';
-          dayRow.innerHTML = `<td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">▶️ 📅 ${currentDay} - 🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>`;
+          dayRow.innerHTML = `<td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">▶️ 📅 ${currentDay} - ${sunriseText} / ${sunsetText}</td>`;
           tbody.appendChild(dayRow);
         }
 
@@ -188,6 +191,8 @@
   }
 
   async function getLocation() {
+    const loading = document.getElementById('loading');
+    loading.style.display = 'block';
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const lat = position.coords.latitude;
@@ -205,12 +210,16 @@
         } catch (error) {
           console.error('Chyba při získávání města z polohy:', error);
           alert('Chyba při získávání města.');
+        } finally {
+          loading.style.display = 'none';
         }
       }, () => {
         alert('Nelze zjistit polohu.');
+        loading.style.display = 'none';
       });
     } else {
       alert('Geolokace není podporována tímto prohlížečem.');
+      loading.style.display = 'none';
     }
   }
 </script>
