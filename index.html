@@ -47,7 +47,6 @@
     <thead>
       <tr>
         <th>🕒 Čas</th>
-        <th>🌅 Východ/Západ</th>
         <th>🌡️ Teplota (°C)</th>
         <th>☁️ Oblačnost (%)</th>
         <th>🌧️ Srážky (mm)</th>
@@ -143,7 +142,7 @@
           currentDay = dayName;
           const dayRow = document.createElement('tr');
           dayRow.className = 'day-row';
-          dayRow.innerHTML = `<td colspan="6" class="day-cell">📅 ${currentDay}</td>`;
+          dayRow.innerHTML = `<td colspan="5" class="day-cell">📅 ${currentDay} - 🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>`;
           tbody.appendChild(dayRow);
         }
 
@@ -155,8 +154,7 @@
         const row = document.createElement('tr');
         row.className = cloudClass.trim();
         row.innerHTML = `
-          <td>🕒 ${times[i]?.replace('T', ' ')} ${emoji}</td>
-          <td>🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>
+          <td>🕒 ${timePart} ${emoji}</td>
           <td>🌡️ ${temps[i] ?? 'N/A'}</td>
           <td>☁️ ${clouds[i] ?? 'N/A'}</td>
           <td>🌧️ ${rain[i] ?? 'N/A'}</td>
