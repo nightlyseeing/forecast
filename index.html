@@ -10,6 +10,11 @@
     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     th { background-color: #f4f4f4; position: sticky; top: 0; }
     .controls { margin-bottom: 20px; }
+    .low-cloud { background-color: #d4edda; }
+    .medium-cloud { background-color: #fff3cd; }
+    .high-cloud { background-color: #f8d7da; }
+    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; }
+    .day-cell { text-align: left; padding-left: 10px; border-bottom: 2px solid #000; }
   </style>
 </head>
 <body>
@@ -23,11 +28,11 @@
   <table id="forecast">
     <thead>
       <tr>
-        <th>Čas</th>
-        <th>Teplota (°C)</th>
-        <th>Oblačnost (%)</th>
-        <th>Srážky (mm)</th>
-        <th>Vítr (km/h)</th>
+        <th>🕒 Čas</th>
+        <th>🌡️ Teplota (°C)</th>
+        <th>☁️ Oblačnost (%)</th>
+        <th>🌧️ Srážky (mm)</th>
+        <th>💨 Vítr (km/h)</th>
       </tr>
     </thead>
     <tbody>
@@ -35,6 +40,21 @@
   </table>
 
   <script>
+    function getDayName(dateString) {
+      const date = new Date(dateString);
+      const dayName = date.toLocaleDateString('cs-CZ', { weekday: 'long' });
+      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    }
+
+    function getTimeEmoji(hour) {
+      if (hour >= 5 && hour < 9) return '🌅'; // ráno
+      if (hour >= 9 && hour < 12) return '🌄'; // dopoledne
+      if (hour >= 12 && hour < 14) return '🌞'; // poledne
+      if (hour >= 14 && hour < 18) return '🌇'; // odpoledne
+      if (hour >= 18 && hour < 22) return '🌆'; // večer
+      return '🌃'; // noc
+    }
+
     async function searchCityAndFetchForecast() {
       const city = document.getElementById('cityInput').value.trim();
       if (!city) {
@@ -78,14 +98,43 @@
         const tbody = document.querySelector('#forecast tbody');
         tbody.innerHTML = '';
 
+        let currentDay = '';
+
         for (let i = 0; i < Math.min(times.length, 72); i++) {
+          const [datePart, timePart] = times[i]?.split('T') || ['',''];
+          const dayName = getDayName(datePart);
+          const hour = parseInt(timePart?.split(':')[0], 10);
+          const emoji = getTimeEmoji(hour);
+
+          if (dayName !== currentDay) {
+            currentDay = dayName;
+            const dayRow = document.createElement('tr');
+            dayRow.className = 'day-row';
+            const dayCell = document.createElement('td');
+            dayCell.colSpan = 5;
+            dayCell.className = 'day-cell';
+            dayCell.textContent = `📅 ${currentDay}`;
+            dayRow.appendChild(dayCell);
+            tbody.appendChild(dayRow);
+          }
+
+          let cloudClass = '';
+          if (clouds[i] <= 30) {
+            cloudClass = 'low-cloud';
+          } else if (clouds[i] <= 70) {
+            cloudClass = 'medium-cloud';
+          } else {
+            cloudClass = 'high-cloud';
+          }
+
           const row = document.createElement('tr');
+          row.className = cloudClass;
           row.innerHTML = `
-            <td>${times[i]?.replace('T', ' ') || 'N/A'}</td>
-            <td>${temps[i] ?? 'N/A'}</td>
-            <td>${clouds[i] ?? 'N/A'}</td>
-            <td>${rain[i] ?? 'N/A'}</td>
-            <td>${wind[i] ?? 'N/A'}</td>
+            <td>🕒 ${times[i]?.replace('T', ' ')} ${emoji}</td>
+            <td>🌡️ ${temps[i] ?? 'N/A'}</td>
+            <td>☁️ ${clouds[i] ?? 'N/A'}</td>
+            <td>🌧️ ${rain[i] ?? 'N/A'}</td>
+            <td>💨 ${wind[i] ?? 'N/A'}</td>
           `;
           tbody.appendChild(row);
         }
