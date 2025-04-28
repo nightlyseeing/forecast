@@ -133,7 +133,7 @@
       let currentDay = '';
       let group = 0;
 
-      for (let i = 0; i < Math.min(times.length, 72); i++) {
+      for (let i = 0; i < Math.min(times.length, 168); i++) { // změněno na 168 hodin
         const [datePart, timePart] = times[i]?.split('T') || ['',''];
         const dayName = getDayName(datePart);
         const hour = parseInt(timePart?.split(':')[0], 10);
