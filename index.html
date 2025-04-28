@@ -7,14 +7,34 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; transition: background-color 0.3s; }
+    tr:hover { background-color: #f1f1f1; }
+    tr.selected { background-color: #b3d7ff !important; }
     th { background-color: #f4f4f4; position: sticky; top: 0; }
-    .controls { margin-bottom: 20px; }
+    .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
     .high-cloud { background-color: #f8d7da; }
-    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; }
+    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; cursor: pointer; }
     .day-cell { text-align: left; padding-left: 10px; border-bottom: 2px solid #000; }
+    .time-emoji {
+      background-color: #66b2ff;
+      border-radius: 6px;
+      padding: 4px;
+      display: inline-block;
+      color: white;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+      font-size: 90%;
+      min-width: 30px;
+      min-height: 30px;
+      line-height: 22px;
+      text-align: center;
+    }
+    .night-emoji {
+      background-color: #003366;
+    }
+    .hidden-row { display: none; }
+    #gpsButton { cursor: pointer; background: none; border: none; font-size: 24px; }
   </style>
 </head>
 <body>
@@ -22,8 +42,11 @@
 
   <div class="controls">
     <input type="text" id="cityInput" placeholder="Zadejte město (např. Praha)">
+    <button id="gpsButton" onclick="getLocation()">📍</button>
     <button onclick="searchCityAndFetchForecast()">Zobrazit předpověď</button>
   </div>
+
+  <div id="loading" style="display:none; margin-bottom:10px;">⏳ Načítám polohu...</div>
 
   <table id="forecast">
     <thead>
@@ -39,110 +62,123 @@
     </tbody>
   </table>
 
-  <script>
-    function getDayName(dateString) {
-      const date = new Date(dateString);
-      const dayName = date.toLocaleDateString('cs-CZ', { weekday: 'long' });
-      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
-    }
+<script>
+  function getDayName(dateString) {
+    const date = new Date(dateString);
+    const dayName = date.toLocaleDateString('cs-CZ', { weekday: 'long' });
+    return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+  }
 
-    function getTimeEmoji(hour) {
-      if (hour >= 5 && hour < 9) return '🌅'; // ráno
-      if (hour >= 9 && hour < 12) return '🌄'; // dopoledne
-      if (hour >= 12 && hour < 14) return '🌞'; // poledne
-      if (hour >= 14 && hour < 18) return '🌇'; // odpoledne
-      if (hour >= 18 && hour < 22) return '🌆'; // večer
-      return '🌃'; // noc
-    }
+  function getSimpleTimeEmoji(hour) {
+    if (hour >= 5 && hour < 8) return '<span class="time-emoji">🌅</span>';
+    if (hour >= 8 && hour < 18) return '<span class="time-emoji">🌞</span>';
+    if (hour >= 18 && hour < 21) return '<span class="time-emoji">🌇</span>';
+    return '<span class="time-emoji night-emoji">🌙</span>';
+  }
 
-    async function searchCityAndFetchForecast() {
-      const city = document.getElementById('cityInput').value.trim();
-      if (!city) {
-        alert('Zadejte název města.');
+  async function searchCityAndFetchForecast() {
+    const city = document.getElementById('cityInput').value.trim();
+    if (!city) {
+      alert('Zadejte název města.');
+      return;
+    }
+    try {
+      const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json&limit=1`);
+      const geoData = await geoResponse.json();
+      if (!geoData.length) {
+        alert('Město nenalezeno.');
         return;
       }
-      try {
-        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json&limit=1`);
-        const geoData = await geoResponse.json();
-        if (!geoData.length) {
-          alert('Město nenalezeno.');
-          return;
-        }
-        const latitude = geoData[0].lat;
-        const longitude = geoData[0].lon;
-        fetchForecast(latitude, longitude);
-      } catch (error) {
-        console.error('Chyba při hledání města:', error);
-        alert('Nepodařilo se najít město.');
-      }
+      const latitude = geoData[0].lat;
+      const longitude = geoData[0].lon;
+      fetchForecast(latitude, longitude);
+    } catch (error) {
+      console.error('Chyba při hledání města:', error);
+      alert('Nepodařilo se najít město.');
     }
+  }
 
-    async function fetchForecast(lat, lon) {
-      try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
-        if (!response.ok) {
-          throw new Error('HTTP chyba: ' + response.status);
+  async function fetchForecast(lat, lon) {
+    try {
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+      if (!response.ok) {
+        throw new Error('HTTP chyba: ' + response.status);
+      }
+      const data = await response.json();
+
+      if (!data.hourly) {
+        throw new Error('Neplatná struktura dat z API.');
+      }
+
+      const times = data.hourly.time || [];
+      const temps = data.hourly.temperature_2m || [];
+      const clouds = data.hourly.cloudcover || [];
+      const rain = data.hourly.precipitation || [];
+      const wind = data.hourly.windspeed_10m || [];
+
+      const tbody = document.querySelector('#forecast tbody');
+      tbody.innerHTML = '';
+
+      let currentDay = '';
+      let dayGroup = 0;
+
+      for (let i = 0; i < Math.min(times.length, 72); i++) {
+        const [datePart, timePart] = times[i]?.split('T') || ['',''];
+        const dayName = getDayName(datePart);
+        const hour = parseInt(timePart?.split(':')[0], 10);
+        const emoji = getSimpleTimeEmoji(hour);
+
+        if (dayName !== currentDay) {
+          dayGroup++;
+          currentDay = dayName;
+          const dayRow = document.createElement('tr');
+          dayRow.className = 'day-row';
+          dayRow.dataset.group = dayGroup;
+          dayRow.innerHTML = `<td colspan="5" class="day-cell" onclick="toggleDay(this, ${dayGroup})">▶️ 📅 ${currentDay}</td>`;
+          tbody.appendChild(dayRow);
         }
-        const data = await response.json();
 
-        if (!data.hourly) {
-          throw new Error('Neplatná struktura dat z API.');
-        }
+        let cloudClass = '';
+        if (clouds[i] <= 30) cloudClass = 'low-cloud';
+        else if (clouds[i] <= 70) cloudClass = 'medium-cloud';
+        else cloudClass = 'high-cloud';
 
-        const times = data.hourly.time || [];
-        const temps = data.hourly.temperature_2m || [];
-        const clouds = data.hourly.cloudcover || [];
-        const rain = data.hourly.precipitation || [];
-        const wind = data.hourly.windspeed_10m || [];
+        const row = document.createElement('tr');
+        row.className = `${cloudClass.trim()} group-${dayGroup}`;
+        row.innerHTML = `
+          <td>🕒 ${times[i]?.replace('T', ' ')} ${emoji}</td>
+          <td>🌡️ ${temps[i] ?? 'N/A'}</td>
+          <td>☁️ ${clouds[i] ?? 'N/A'}</td>
+          <td>🌧️ ${rain[i] ?? 'N/A'}</td>
+          <td>💨 ${wind[i] ?? 'N/A'}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    } catch (error) {
+      console.error('Chyba při načítání předpovědi:', error);
+      alert('Nepodařilo se načíst předpověď.');
+    }
+  }
 
-        const tbody = document.querySelector('#forecast tbody');
-        tbody.innerHTML = '';
+  function toggleDay(cell, group) {
+    const rows = document.querySelectorAll(`.group-${group}`);
+    rows.forEach(row => row.classList.toggle('hidden-row'));
+    cell.innerHTML = cell.innerHTML.includes('▶️') ? cell.innerHTML.replace('▶️', '🔽') : cell.innerHTML.replace('🔽', '▶️');
+  }
 
-        let currentDay = '';
-
-        for (let i = 0; i < Math.min(times.length, 72); i++) {
-          const [datePart, timePart] = times[i]?.split('T') || ['',''];
-          const dayName = getDayName(datePart);
-          const hour = parseInt(timePart?.split(':')[0], 10);
-          const emoji = getTimeEmoji(hour);
-
-          if (dayName !== currentDay) {
-            currentDay = dayName;
-            const dayRow = document.createElement('tr');
-            dayRow.className = 'day-row';
-            const dayCell = document.createElement('td');
-            dayCell.colSpan = 5;
-            dayCell.className = 'day-cell';
-            dayCell.textContent = `📅 ${currentDay}`;
-            dayRow.appendChild(dayCell);
-            tbody.appendChild(dayRow);
-          }
-
-          let cloudClass = '';
-          if (clouds[i] <= 30) {
-            cloudClass = 'low-cloud';
-          } else if (clouds[i] <= 70) {
-            cloudClass = 'medium-cloud';
+  async function getLocation() {
+    document.getElementById('loading').style.display = 'block';
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+          const data = await response.json();
+          if (data.address && data.address.city) {
+            document.getElementById('cityInput').value = data.address.city;
+            searchCityAndFetchForecast();
           } else {
-            cloudClass = 'high-cloud';
+            alert('Nepodařilo se zjistit město podle polohy.');
           }
-
-          const row = document.createElement('tr');
-          row.className = cloudClass;
-          row.innerHTML = `
-            <td>🕒 ${times[i]?.replace('T', ' ')} ${emoji}</td>
-            <td>🌡️ ${temps[i] ?? 'N/A'}</td>
-            <td>☁️ ${clouds[i] ?? 'N/A'}</td>
-            <td>🌧️ ${rain[i] ?? 'N/A'}</td>
-            <td>💨 ${wind[i] ?? 'N/A'}</td>
-          `;
-          tbody.appendChild(row);
         }
-      } catch (error) {
-        console.error('Chyba při načítání předpovědi:', error);
-        alert('Nepodařilo se načíst předpověď.');
-      }
-    }
-  </script>
-</body>
-</html>
