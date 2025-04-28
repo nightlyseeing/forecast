@@ -35,7 +35,8 @@
   </style>
 </head>
 <body>
-  <h1>Astronomická předpověď - Vyhledávání měst</h1>
+  <h1>Astronomická předpověď</h1>
+  <h2 id="cityDisplay"></h2>
 
   <div class="controls">
     <input type="text" id="cityInput" placeholder="Zadejte město (např. Praha)">
@@ -47,6 +48,7 @@
     <thead>
       <tr>
         <th>🕒 Čas</th>
+        <th>🌗 Den/Noc</th>
         <th>🌡️ Teplota (°C)</th>
         <th>☁️ Oblačnost (%)</th>
         <th>🌧️ Srážky (mm)</th>
@@ -60,6 +62,7 @@
 <script>
   let sunriseTimes = {};
   let sunsetTimes = {};
+  let currentCity = '';
 
   function getDayName(dateString) {
     const date = new Date(dateString);
@@ -71,10 +74,15 @@
     const sunriseHour = sunriseTimes[dateStr] ? parseInt(sunriseTimes[dateStr].split(":")[0], 10) : 6;
     const sunsetHour = sunsetTimes[dateStr] ? parseInt(sunsetTimes[dateStr].split(":")[0], 10) : 18;
 
-    if (hour >= sunriseHour - 1 && hour <= sunriseHour + 1) return '<span class="time-emoji">🌅</span>';
-    if (hour > sunriseHour + 1 && hour < sunsetHour - 1) return '<span class="time-emoji">🌞</span>';
-    if (hour >= sunsetHour - 1 && hour <= sunsetHour + 1) return '<span class="time-emoji">🌇</span>';
-    return '<span class="time-emoji night-emoji">🌙</span>';
+    if (hour >= sunriseHour - 1 && hour <= sunriseHour + 1) {
+      return '<span class="time-emoji">🌅</span>';
+    } else if (hour > sunriseHour + 1 && hour < sunsetHour - 1) {
+      return '<span class="time-emoji">🌞</span>';
+    } else if (hour >= sunsetHour - 1 && hour <= sunsetHour + 1) {
+      return '<span class="time-emoji">🌇</span>';
+    } else {
+      return '<span class="time-emoji night-emoji">🌙</span>';
+    }
   }
 
   async function searchCityAndFetchForecast() {
@@ -83,6 +91,8 @@
       alert('Zadejte název města.');
       return;
     }
+    currentCity = city;
+    document.getElementById('cityDisplay').innerText = city;
     try {
       const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json&limit=1`);
       const geoData = await geoResponse.json();
@@ -111,12 +121,12 @@
         throw new Error('Neplatná struktura dat z API.');
       }
 
-      (data.daily.sunrise || []).forEach((sun, idx) => {
+      (data.daily.sunrise || []).forEach((sun) => {
         const [date, time] = sun.split('T');
         sunriseTimes[date] = time;
       });
 
-      (data.daily.sunset || []).forEach((sun, idx) => {
+      (data.daily.sunset || []).forEach((sun) => {
         const [date, time] = sun.split('T');
         sunsetTimes[date] = time;
       });
@@ -131,6 +141,7 @@
       tbody.innerHTML = '';
 
       let currentDay = '';
+      let group = 0;
 
       for (let i = 0; i < Math.min(times.length, 72); i++) {
         const [datePart, timePart] = times[i]?.split('T') || ['',''];
@@ -140,9 +151,10 @@
 
         if (dayName !== currentDay) {
           currentDay = dayName;
+          group++;
           const dayRow = document.createElement('tr');
           dayRow.className = 'day-row';
-          dayRow.innerHTML = `<td colspan="5" class="day-cell">📅 ${currentDay} - 🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>`;
+          dayRow.innerHTML = `<td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">▶️ 📅 ${currentDay} - 🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>`;
           tbody.appendChild(dayRow);
         }
 
@@ -152,9 +164,10 @@
         else cloudClass = 'high-cloud';
 
         const row = document.createElement('tr');
-        row.className = cloudClass.trim();
+        row.className = `${cloudClass.trim()} group-${group}`;
         row.innerHTML = `
-          <td>🕒 ${timePart} ${emoji}</td>
+          <td>🕒 ${timePart}</td>
+          <td>${emoji}</td>
           <td>🌡️ ${temps[i] ?? 'N/A'}</td>
           <td>☁️ ${clouds[i] ?? 'N/A'}</td>
           <td>🌧️ ${rain[i] ?? 'N/A'}</td>
@@ -168,6 +181,12 @@
     }
   }
 
+  function toggleDay(cell, group) {
+    const rows = document.querySelectorAll(`.group-${group}`);
+    rows.forEach(row => row.classList.toggle('hidden-row'));
+    cell.innerHTML = cell.innerHTML.includes('▶️') ? cell.innerHTML.replace('▶️', '🔽') : cell.innerHTML.replace('🔽', '▶️');
+  }
+
   async function getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -178,7 +197,8 @@
           const data = await response.json();
           if (data.address && data.address.city) {
             document.getElementById('cityInput').value = data.address.city;
-            searchCityAndFetchForecast();
+            document.getElementById('cityDisplay').innerText = data.address.city;
+            fetchForecast(lat, lon);
           } else {
             alert('Nepodařilo se zjistit město podle polohy.');
           }
