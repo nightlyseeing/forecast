@@ -181,4 +181,22 @@
           } else {
             alert('Nepodařilo se zjistit město podle polohy.');
           }
+        } catch (error) {
+          console.error('Chyba při získávání města z polohy:', error);
+          alert('Chyba při získávání města.');
+        } finally {
+          document.getElementById('loading').style.display = 'none';
         }
+      }, () => {
+        alert('Nelze zjistit polohu.');
+        document.getElementById('loading').style.display = 'none';
+      });
+    } else {
+      alert('Geolokace není podporována tímto prohlížečem.');
+      document.getElementById('loading').style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>
