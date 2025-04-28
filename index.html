@@ -3,31 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astronomická předpověď - Praha</title>
+  <title>Astronomická předpověď - Vyhledávání měst</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     th { background-color: #f4f4f4; position: sticky; top: 0; }
-    .cloud-high { background-color: #d0e6ff; }
-    .cloud-mid { background-color: #b0d4ff; }
-    .cloud-low { background-color: #90c2ff; }
+    .controls { margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <h1>Astronomická předpověď pro Prahu na 3 dny (hodinová)</h1>
+  <h1>Astronomická předpověď - Vyhledávání měst</h1>
+
+  <div class="controls">
+    <input type="text" id="cityInput" placeholder="Zadejte město (např. Praha)">
+    <button onclick="searchCityAndFetchForecast()">Zobrazit předpověď</button>
+  </div>
 
   <table id="forecast">
     <thead>
       <tr>
         <th>Čas</th>
-        <th>Oblačnost (%)</th>
-        <th>Vysoká oblačnost (%)</th>
-        <th>Střední oblačnost (%)</th>
-        <th>Nízká oblačnost (%)</th>
-        <th>Srážky (mm)</th>
         <th>Teplota (°C)</th>
-        <th>Vlhkost (%)</th>
+        <th>Oblačnost (%)</th>
+        <th>Srážky (mm)</th>
         <th>Vítr (km/h)</th>
       </tr>
     </thead>
@@ -36,55 +35,65 @@
   </table>
 
   <script>
-    const API_KEY = '3kxa044iemqlkagfnqz49phxf3ijs21wye855qvv';
-
-    async function fetchForecast() {
+    async function searchCityAndFetchForecast() {
+      const city = document.getElementById('cityInput').value.trim();
+      if (!city) {
+        alert('Zadejte název města.');
+        return;
+      }
       try {
-        const response = await fetch(`https://www.meteosource.com/api/v1/free/point?place_id=prague&sections=hourly&timezone=Europe/Prague&language=cs&units=metric&key=${API_KEY}`);
+        const geoResponse = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(city)}&format=json&limit=1`);
+        const geoData = await geoResponse.json();
+        if (!geoData.length) {
+          alert('Město nenalezeno.');
+          return;
+        }
+        const latitude = geoData[0].lat;
+        const longitude = geoData[0].lon;
+        fetchForecast(latitude, longitude);
+      } catch (error) {
+        console.error('Chyba při hledání města:', error);
+        alert('Nepodařilo se najít město.');
+      }
+    }
+
+    async function fetchForecast(lat, lon) {
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
         if (!response.ok) {
           throw new Error('HTTP chyba: ' + response.status);
         }
         const data = await response.json();
 
-        if (!data || !data.hourly || !Array.isArray(data.hourly.data)) {
+        if (!data.hourly) {
           throw new Error('Neplatná struktura dat z API.');
         }
+
+        const times = data.hourly.time || [];
+        const temps = data.hourly.temperature_2m || [];
+        const clouds = data.hourly.cloudcover || [];
+        const rain = data.hourly.precipitation || [];
+        const wind = data.hourly.windspeed_10m || [];
 
         const tbody = document.querySelector('#forecast tbody');
         tbody.innerHTML = '';
 
-        data.hourly.data.slice(0, 72).forEach(hour => {
-          const time = hour.time ? hour.time.replace('T', ' ') : 'N/A';
-          const cloudCover = hour.cloud_cover ?? 'N/A';
-          const highClouds = hour.high_clouds ?? 'N/A';
-          const middleClouds = hour.middle_clouds ?? 'N/A';
-          const lowClouds = hour.low_clouds ?? 'N/A';
-          const precipitation = hour.precipitation_total ?? 0;
-          const temperature = hour.temperature ?? 'N/A';
-          const humidity = hour.humidity ?? 'N/A';
-          const windSpeed = hour.wind?.speed ?? 'N/A';
-
+        for (let i = 0; i < Math.min(times.length, 72); i++) {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${time}</td>
-            <td>${cloudCover}</td>
-            <td class="cloud-high">${highClouds}</td>
-            <td class="cloud-mid">${middleClouds}</td>
-            <td class="cloud-low">${lowClouds}</td>
-            <td>${precipitation}</td>
-            <td>${temperature}</td>
-            <td>${humidity}</td>
-            <td>${windSpeed}</td>
+            <td>${times[i]?.replace('T', ' ') || 'N/A'}</td>
+            <td>${temps[i] ?? 'N/A'}</td>
+            <td>${clouds[i] ?? 'N/A'}</td>
+            <td>${rain[i] ?? 'N/A'}</td>
+            <td>${wind[i] ?? 'N/A'}</td>
           `;
           tbody.appendChild(row);
-        });
+        }
       } catch (error) {
         console.error('Chyba při načítání předpovědi:', error);
-        alert('Nepodařilo se načíst předpověď. Zkontrolujte API klíč nebo dostupnost služby.');
+        alert('Nepodařilo se načíst předpověď.');
       }
     }
-
-    fetchForecast();
   </script>
 </body>
 </html>
