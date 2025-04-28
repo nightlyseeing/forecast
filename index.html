@@ -9,7 +9,6 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; transition: background-color 0.3s; }
     tr:hover { background-color: #f1f1f1; }
-    tr.selected { background-color: #b3d7ff !important; }
     th { background-color: #f4f4f4; position: sticky; top: 0; }
     .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
     .low-cloud { background-color: #d4edda; }
@@ -30,9 +29,7 @@
       line-height: 22px;
       text-align: center;
     }
-    .night-emoji {
-      background-color: #003366;
-    }
+    .night-emoji { background-color: #003366; }
     .hidden-row { display: none; }
     #gpsButton { cursor: pointer; background: none; border: none; font-size: 24px; }
   </style>
@@ -46,12 +43,11 @@
     <button onclick="searchCityAndFetchForecast()">Zobrazit předpověď</button>
   </div>
 
-  <div id="loading" style="display:none; margin-bottom:10px;">⏳ Načítám polohu...</div>
-
   <table id="forecast">
     <thead>
       <tr>
         <th>🕒 Čas</th>
+        <th>🌅 Východ/Západ</th>
         <th>🌡️ Teplota (°C)</th>
         <th>☁️ Oblačnost (%)</th>
         <th>🌧️ Srážky (mm)</th>
@@ -63,16 +59,22 @@
   </table>
 
 <script>
+  let sunriseTimes = {};
+  let sunsetTimes = {};
+
   function getDayName(dateString) {
     const date = new Date(dateString);
     const dayName = date.toLocaleDateString('cs-CZ', { weekday: 'long' });
     return dayName.charAt(0).toUpperCase() + dayName.slice(1);
   }
 
-  function getSimpleTimeEmoji(hour) {
-    if (hour >= 5 && hour < 8) return '<span class="time-emoji">🌅</span>';
-    if (hour >= 8 && hour < 18) return '<span class="time-emoji">🌞</span>';
-    if (hour >= 18 && hour < 21) return '<span class="time-emoji">🌇</span>';
+  function getSimpleTimeEmoji(hour, dateStr) {
+    const sunriseHour = sunriseTimes[dateStr] ? parseInt(sunriseTimes[dateStr].split(":")[0], 10) : 6;
+    const sunsetHour = sunsetTimes[dateStr] ? parseInt(sunsetTimes[dateStr].split(":")[0], 10) : 18;
+
+    if (hour >= sunriseHour - 1 && hour <= sunriseHour + 1) return '<span class="time-emoji">🌅</span>';
+    if (hour > sunriseHour + 1 && hour < sunsetHour - 1) return '<span class="time-emoji">🌞</span>';
+    if (hour >= sunsetHour - 1 && hour <= sunsetHour + 1) return '<span class="time-emoji">🌇</span>';
     return '<span class="time-emoji night-emoji">🌙</span>';
   }
 
@@ -100,15 +102,25 @@
 
   async function fetchForecast(lat, lon) {
     try {
-      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&daily=sunrise,sunset&timezone=Europe/Prague`);
       if (!response.ok) {
         throw new Error('HTTP chyba: ' + response.status);
       }
       const data = await response.json();
 
-      if (!data.hourly) {
+      if (!data.hourly || !data.daily) {
         throw new Error('Neplatná struktura dat z API.');
       }
+
+      (data.daily.sunrise || []).forEach((sun, idx) => {
+        const [date, time] = sun.split('T');
+        sunriseTimes[date] = time;
+      });
+
+      (data.daily.sunset || []).forEach((sun, idx) => {
+        const [date, time] = sun.split('T');
+        sunsetTimes[date] = time;
+      });
 
       const times = data.hourly.time || [];
       const temps = data.hourly.temperature_2m || [];
@@ -120,21 +132,18 @@
       tbody.innerHTML = '';
 
       let currentDay = '';
-      let dayGroup = 0;
 
       for (let i = 0; i < Math.min(times.length, 72); i++) {
         const [datePart, timePart] = times[i]?.split('T') || ['',''];
         const dayName = getDayName(datePart);
         const hour = parseInt(timePart?.split(':')[0], 10);
-        const emoji = getSimpleTimeEmoji(hour);
+        const emoji = getSimpleTimeEmoji(hour, datePart);
 
         if (dayName !== currentDay) {
-          dayGroup++;
           currentDay = dayName;
           const dayRow = document.createElement('tr');
           dayRow.className = 'day-row';
-          dayRow.dataset.group = dayGroup;
-          dayRow.innerHTML = `<td colspan="5" class="day-cell" onclick="toggleDay(this, ${dayGroup})">▶️ 📅 ${currentDay}</td>`;
+          dayRow.innerHTML = `<td colspan="6" class="day-cell">📅 ${currentDay}</td>`;
           tbody.appendChild(dayRow);
         }
 
@@ -144,9 +153,10 @@
         else cloudClass = 'high-cloud';
 
         const row = document.createElement('tr');
-        row.className = `${cloudClass.trim()} group-${dayGroup}`;
+        row.className = cloudClass.trim();
         row.innerHTML = `
           <td>🕒 ${times[i]?.replace('T', ' ')} ${emoji}</td>
+          <td>🌅 ${sunriseTimes[datePart] || 'N/A'} / 🌇 ${sunsetTimes[datePart] || 'N/A'}</td>
           <td>🌡️ ${temps[i] ?? 'N/A'}</td>
           <td>☁️ ${clouds[i] ?? 'N/A'}</td>
           <td>🌧️ ${rain[i] ?? 'N/A'}</td>
@@ -160,14 +170,7 @@
     }
   }
 
-  function toggleDay(cell, group) {
-    const rows = document.querySelectorAll(`.group-${group}`);
-    rows.forEach(row => row.classList.toggle('hidden-row'));
-    cell.innerHTML = cell.innerHTML.includes('▶️') ? cell.innerHTML.replace('▶️', '🔽') : cell.innerHTML.replace('🔽', '▶️');
-  }
-
   async function getLocation() {
-    document.getElementById('loading').style.display = 'block';
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const lat = position.coords.latitude;
@@ -184,16 +187,12 @@
         } catch (error) {
           console.error('Chyba při získávání města z polohy:', error);
           alert('Chyba při získávání města.');
-        } finally {
-          document.getElementById('loading').style.display = 'none';
         }
       }, () => {
         alert('Nelze zjistit polohu.');
-        document.getElementById('loading').style.display = 'none';
       });
     } else {
       alert('Geolokace není podporována tímto prohlížečem.');
-      document.getElementById('loading').style.display = 'none';
     }
   }
 </script>
