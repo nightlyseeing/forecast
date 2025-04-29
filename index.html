@@ -2,48 +2,67 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Astronomická předpověď</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* --- Moderní CSS styly --- */
     * { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; padding: 15px; margin: 0; background-color: #f9f9f9; }
-    h1, h2 { margin: 0 0 10px; }
-
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #eef2f5;
+      padding: 20px;
+      margin: 0;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #222;
+    }
     .controls {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
     }
-
     .input-container {
       flex: 1 1 250px;
       max-width: 100%;
       position: relative;
     }
-
     input[type="text"] {
       width: 100%;
-      padding: 10px 35px 10px 10px;
+      padding: 10px 40px 10px 15px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: border-color 0.3s;
     }
-
+    input[type="text"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
     button {
-      padding: 10px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
       background-color: #007bff;
       color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
     }
-
     button:hover {
       background-color: #0056b3;
+      transform: translateY(-2px);
     }
-
     .clear-button {
       position: absolute;
       right: 10px;
@@ -54,10 +73,9 @@
       font-size: 18px;
       color: #888;
       display: none;
+      cursor: pointer;
     }
-
     .clear-button:hover { color: #000; }
-
     #suggestions {
       position: absolute;
       top: 100%;
@@ -69,70 +87,77 @@
       overflow-y: auto;
       z-index: 10;
       display: none;
+      border-radius: 8px;
     }
-
     #suggestions li {
       padding: 10px;
       list-style: none;
       cursor: pointer;
     }
-
     #suggestions li:hover, #suggestions li.active {
       background-color: #007bff;
       color: white;
+      border-radius: 8px;
     }
-
     #forecast {
-      width: 100%;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       overflow-x: auto;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       min-width: 600px;
-      background: white;
     }
-
     th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
       text-align: center;
-      font-size: 14px;
     }
-
-    tr:hover { background-color: #f1f1f1; }
-    .day-row { background-color: #e2e3e5; font-weight: bold; }
-    .day-cell {
-      padding: 12px;
-      line-height: 1.6;
-      font-size: 15px;
-      text-align: left;
+    tr:hover {
+      background-color: #f9fafc;
     }
-
+    .day-row {
+      background-color: #dfe6ed;
+      font-weight: bold;
+      cursor: pointer;
+    }
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
     .high-cloud { background-color: #f8d7da; }
     .hidden-row { display: none; }
-
     #loading-spinner {
-      font-size: 18px;
-      margin-bottom: 10px;
-      display: none; /* změněno z původního zobrazení */
+      display: none;
+      text-align: center;
+      margin: 20px 0;
     }
-
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     @media (max-width: 600px) {
-      th, td { font-size: 13px; padding: 6px; }
-      .day-cell { font-size: 14px; }
-      button { width: 100%; }
+      .controls { flex-direction: column; }
+      th, td { font-size: 14px; }
     }
   </style>
 </head>
+
 <body>
 
 <h1>Astronomická předpověď</h1>
 <h2 id="cityDisplay"></h2>
-<div id="loading-spinner">⏳ Načítám...</div>
+<div id="loading-spinner"><div class="spinner"></div></div>
 
 <div class="controls">
   <div class="input-container">
@@ -151,6 +176,8 @@
 </div>
 
 <script>
+// JavaScript opravený a přidán zpět
+
 function getDayName(dateString) {
   const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
   return days[new Date(dateString).getDay()];
@@ -175,9 +202,9 @@ const moonPhaseLabels = ["Nov", "Dorůstající srpek", "První čtvrť", "Dorů
 function getMoonPhase(date) {
   const lp = 2551443;
   const now = new Date(date);
-  const new_moon = new Date(2001,0,24,13,35);
+  const new_moon = new Date(2001, 0, 24, 13, 35);
   const phase = ((now.getTime() - new_moon.getTime()) / 1000) % lp;
-  const age = Math.floor(phase / (24*3600));
+  const age = Math.floor(phase / (24 * 3600));
   if (age < 1 || age >= 29) return ['🌑', 'Nov'];
   else if (age < 7) return ['🌒', 'Dorůstající srpek'];
   else if (age < 10) return ['🌓', 'První čtvrť'];
@@ -189,6 +216,7 @@ function getMoonPhase(date) {
 }
 
 let sunriseTimes = {}, sunsetTimes = {};
+let selectedCity = null;
 
 async function fetchForecast(lat, lon) {
   try {
@@ -198,8 +226,8 @@ async function fetchForecast(lat, lon) {
     const data = await response.json();
 
     sunriseTimes = {}, sunsetTimes = {};
-    (data.daily.sunrise || []).forEach(s => { const [d,t] = s.split('T'); sunriseTimes[d] = t; });
-    (data.daily.sunset || []).forEach(s => { const [d,t] = s.split('T'); sunsetTimes[d] = t; });
+    (data.daily.sunrise || []).forEach(s => { const [d, t] = s.split('T'); sunriseTimes[d] = t; });
+    (data.daily.sunset || []).forEach(s => { const [d, t] = s.split('T'); sunsetTimes[d] = t; });
 
     const { time = [], temperature_2m = [], cloudcover = [], precipitation = [], windspeed_10m = [] } = data.hourly || {};
     const tbody = document.querySelector('#forecast tbody');
@@ -209,7 +237,7 @@ async function fetchForecast(lat, lon) {
     let group = 0;
 
     for (let i = 0; i < Math.min(time.length, 168); i++) {
-      const [datePart, timePart] = time[i]?.split('T') || ['',''];
+      const [datePart, timePart] = time[i]?.split('T') || ['', ''];
       const dayName = getDayName(datePart);
       const hour = parseInt(timePart?.split(':')[0], 10);
       const emoji = getSimpleTimeEmoji(hour, datePart);
@@ -243,6 +271,7 @@ async function fetchForecast(lat, lon) {
             🕰️ Délka dne: ${dayLength}
           </td>`;
         tbody.appendChild(dayRow);
+
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
           <th>🕒 Čas</th>
@@ -251,8 +280,8 @@ async function fetchForecast(lat, lon) {
           <th>☁️ Oblačnost (%)</th>
           <th>🌧️ Srážky (mm)</th>
           <th>💨 Vítr (km/h)</th>
-`;
-tbody.appendChild(headerRow);
+        `;
+        tbody.appendChild(headerRow);
       }
 
       let cloudClass = '';
@@ -280,8 +309,6 @@ tbody.appendChild(headerRow);
   }
 }
 
-let selectedCity = null;
-
 async function autocompleteCities() {
   const input = document.getElementById('cityInput').value.trim();
   const suggestions = document.getElementById('suggestions');
@@ -292,9 +319,7 @@ async function autocompleteCities() {
     clearBtn.style.display = 'none';
     return;
   }
-
   clearBtn.style.display = 'block';
-
   try {
     const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=5&language=cs&format=json`);
     const data = await res.json();
@@ -323,7 +348,6 @@ async function autocompleteCities() {
 function handleSuggestionKeys(event) {
   const suggestions = Array.from(document.querySelectorAll('#suggestions li'));
   let index = suggestions.findIndex(el => el.classList.contains('active'));
-
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     if (index < suggestions.length - 1) {
