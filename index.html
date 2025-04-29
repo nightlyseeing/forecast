@@ -1,32 +1,125 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Astronomická předpověď</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; transition: background-color 0.3s; }
-    tr:hover { background-color: #f1f1f1; }
-    .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
-    .input-container { position: relative; width: 300px; }
-    .input-container input[type="text"] { width: 100%; padding: 8px 30px 8px 10px; box-sizing: border-box; }
-    .clear-button { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 18px; cursor: pointer; color: #888; display: none; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; padding: 15px; margin: 0; background-color: #f9f9f9; }
+    h1, h2 { margin: 0 0 10px; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .input-container {
+      flex: 1 1 250px;
+      max-width: 100%;
+      position: relative;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 35px 10px 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .clear-button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #888;
+      display: none;
+    }
+
     .clear-button:hover { color: #000; }
-    #suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-top: none; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); display: none; }
-    #suggestions li { list-style: none; padding: 10px; cursor: pointer; transition: background-color 0.2s; }
-    #suggestions li:hover, #suggestions li.active { background-color: #007bff; color: white; }
-    button { padding: 8px 12px; }
+
+    #suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+
+    #suggestions li {
+      padding: 10px;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    #suggestions li:hover, #suggestions li.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    #forecast {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    tr:hover { background-color: #f1f1f1; }
+    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; }
+    .day-cell {
+      padding: 12px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
     .high-cloud { background-color: #f8d7da; }
-    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; cursor: pointer; }
-    .day-cell { text-align: left; padding-left: 10px; border-bottom: 2px solid #000; }
-    .time-emoji { background-color: #66b2ff; border-radius: 6px; padding: 4px; display: inline-block; color: white; box-shadow: 0 0 4px rgba(0, 0, 0, 0.3); font-size: 90%; min-width: 30px; min-height: 30px; line-height: 22px; text-align: center; }
-    .night-emoji { background-color: #003366; }
     .hidden-row { display: none; }
-    #loading-spinner { display: none; font-size: 18px; margin-bottom: 10px; }
+    #loading-spinner { font-size: 18px; margin-bottom: 10px; }
+
+    @media (max-width: 600px) {
+      th, td { font-size: 13px; padding: 6px; }
+      .day-cell { font-size: 14px; }
+      button { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -41,34 +134,155 @@
     <button class="clear-button" id="clearButton" onclick="clearInput()">×</button>
     <ul id="suggestions"></ul>
   </div>
-  <button id="gpsButton" onclick="getLocation()">📍</button>
-  <button onclick="manualSearch()">Zobrazit předpověď</button>
+  <button id="gpsButton" onclick="getLocation()">📍 Moje poloha</button>
+  <button onclick="manualSearch()">🔍 Zobrazit předpověď</button>
 </div>
 
-<table id="forecast">
-  <thead>
-    <tr>
-      <th>🕒 Čas</th>
-      <th>🌗 Den/Noc</th>
-      <th>🌡️ Teplota (°C)</th>
-      <th>☁️ Oblačnost (%)</th>
-      <th>🌧️ Srážky (mm)</th>
-      <th>💨 Vítr (km/h)</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<div id="forecast">
+  <table>
+    <thead>
+      <tr>
+        <th>🕒 Čas</th>
+        <th>🌗 Den/Noc</th>
+        <th>🌡️ Teplota (°C)</th>
+        <th>☁️ Oblačnost (%)</th>
+        <th>🌧️ Srážky (mm)</th>
+        <th>💨 Vítr (km/h)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
 <script>
+// Pomocné funkce
+function getDayName(dateString) {
+  const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+  return days[new Date(dateString).getDay()];
+}
+
+function toggleDay(cell, group) {
+  const rows = document.querySelectorAll(`.group-${group}`);
+  rows.forEach(row => row.classList.toggle('hidden-row'));
+  cell.innerHTML = cell.innerHTML.includes('▶️') ?
+    cell.innerHTML.replace('▶️', '▼') :
+    cell.innerHTML.replace('▼', '▶️');
+}
+
+function getSimpleTimeEmoji(hour, dateStr) {
+  const sunrise = sunriseTimes[dateStr]?.split(':')[0];
+  const sunset = sunsetTimes[dateStr]?.split(':')[0];
+  if (!sunrise || !sunset) return '⏳';
+  return (hour >= +sunrise && hour < +sunset) ? '🌞' : '🌙';
+}
+
+const moonPhaseLabels = ["Nov", "Dorůstající srpek", "První čtvrť", "Dorůstající Měsíc", "Úplněk", "Couvající Měsíc", "Poslední čtvrť", "Ubývající srpek"];
+function getMoonPhase(date) {
+  const lp = 2551443;
+  const now = new Date(date);
+  const new_moon = new Date(2001,0,24,13,35);
+  const phase = ((now.getTime() - new_moon.getTime()) / 1000) % lp;
+  const age = Math.floor(phase / (24*3600));
+  if (age < 1 || age >= 29) return ['🌑', 'Nov'];
+  else if (age < 7) return ['🌒', 'Dorůstající srpek'];
+  else if (age < 10) return ['🌓', 'První čtvrť'];
+  else if (age < 14) return ['🌔', 'Dorůstající Měsíc'];
+  else if (age < 17) return ['🌕', 'Úplněk'];
+  else if (age < 21) return ['🌖', 'Couvající Měsíc'];
+  else if (age < 25) return ['🌗', 'Poslední čtvrť'];
+  else return ['🌘', 'Ubývající srpek'];
+}
+
+let sunriseTimes = {}, sunsetTimes = {};
+
+async function fetchForecast(lat, lon) {
+  try {
+    document.getElementById('loading-spinner').style.display = 'block';
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&daily=sunrise,sunset&timezone=Europe/Prague`);
+    if (!response.ok) throw new Error('HTTP chyba: ' + response.status);
+    const data = await response.json();
+
+    sunriseTimes = {}, sunsetTimes = {};
+    (data.daily.sunrise || []).forEach(s => { const [d,t] = s.split('T'); sunriseTimes[d] = t; });
+    (data.daily.sunset || []).forEach(s => { const [d,t] = s.split('T'); sunsetTimes[d] = t; });
+
+    const { time = [], temperature_2m = [], cloudcover = [], precipitation = [], windspeed_10m = [] } = data.hourly || {};
+    const tbody = document.querySelector('#forecast tbody');
+    tbody.innerHTML = '';
+
+    let currentDay = '';
+    let group = 0;
+
+    for (let i = 0; i < Math.min(time.length, 168); i++) {
+      const [datePart, timePart] = time[i]?.split('T') || ['',''];
+      const dayName = getDayName(datePart);
+      const hour = parseInt(timePart?.split(':')[0], 10);
+      const emoji = getSimpleTimeEmoji(hour, datePart);
+
+      if (dayName !== currentDay) {
+        currentDay = dayName;
+        group++;
+
+        const [moonEmoji, moonLabel] = getMoonPhase(datePart);
+        const sunrise = sunriseTimes[datePart] || 'N/A';
+        const sunset = sunsetTimes[datePart] || 'N/A';
+
+        let dayLength = '';
+        if (sunrise !== 'N/A' && sunset !== 'N/A') {
+          const [srH, srM] = sunrise.split(':').map(Number);
+          const [ssH, ssM] = sunset.split(':').map(Number);
+          const totalMin = (ssH * 60 + ssM) - (srH * 60 + srM);
+          const h = Math.floor(totalMin / 60), m = totalMin % 60;
+          dayLength = `${h} h ${m} min`;
+        }
+
+        const dayRow = document.createElement('tr');
+        dayRow.className = 'day-row';
+        dayRow.innerHTML = `
+          <td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">
+            ▶️ 📅 ${dayName} (${datePart})<br>
+            ☀️ Východ: ${sunrise} / Západ: ${sunset}<br>
+            🌕 Fáze Měsíce: ${moonEmoji} ${moonLabel}<br>
+            🕰️ Délka dne: ${dayLength}
+          </td>`;
+        tbody.appendChild(dayRow);
+      }
+
+      let cloudClass = '';
+      if (cloudcover[i] <= 30) cloudClass = 'low-cloud';
+      else if (cloudcover[i] <= 70) cloudClass = 'medium-cloud';
+      else cloudClass = 'high-cloud';
+
+      const row = document.createElement('tr');
+      row.className = `${cloudClass.trim()} group-${group}`;
+      row.innerHTML = `
+        <td>${timePart}</td>
+        <td>${emoji}</td>
+        <td>${temperature_2m[i] ?? 'N/A'}</td>
+        <td>${cloudcover[i] ?? 'N/A'}</td>
+        <td>${precipitation[i] ?? 'N/A'}</td>
+        <td>${windspeed_10m[i] ?? 'N/A'}</td>
+      `;
+      tbody.appendChild(row);
+    }
+  } catch (err) {
+    console.error('Chyba:', err);
+    alert('Nepodařilo se načíst data.');
+  } finally {
+    document.getElementById('loading-spinner').style.display = 'none';
+  }
+}
+
+// Vyhledávání a GPS
 let selectedCity = null;
 
 async function autocompleteCities() {
   const input = document.getElementById('cityInput').value.trim();
-  const suggestionsList = document.getElementById('suggestions');
+  const suggestions = document.getElementById('suggestions');
   const clearBtn = document.getElementById('clearButton');
 
   if (input.length < 2) {
-    suggestionsList.style.display = 'none';
+    suggestions.style.display = 'none';
     clearBtn.style.display = 'none';
     return;
   }
@@ -80,7 +294,7 @@ async function autocompleteCities() {
     const data = await res.json();
     const cities = data.results || [];
 
-    suggestionsList.innerHTML = '';
+    suggestions.innerHTML = '';
     cities.forEach(city => {
       const li = document.createElement('li');
       li.textContent = `${city.name}, ${city.country}`;
@@ -90,13 +304,13 @@ async function autocompleteCities() {
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('cityDisplay').textContent = `${city.name}, ${city.country}`;
       };
-      suggestionsList.appendChild(li);
+      suggestions.appendChild(li);
     });
 
-    suggestionsList.style.display = 'block';
+    suggestions.style.display = 'block';
   } catch (e) {
-    console.error('Chyba při načítání měst:', e);
-    suggestionsList.style.display = 'none';
+    console.error('Chyba autocomplete:', e);
+    suggestions.style.display = 'none';
   }
 }
 
@@ -142,116 +356,13 @@ function getLocation() {
     alert('Geolokace není podporována tímto prohlížečem.');
     return;
   }
-  navigator.geolocation.getCurrentPosition(position => {
-    const { latitude, longitude } = position.coords;
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
     document.getElementById('cityDisplay').textContent = `Vaše poloha (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`;
     fetchForecast(latitude, longitude);
   }, () => {
     alert('Nepodařilo se získat polohu.');
   });
-}
-
-function getDayName(dateString) {
-  const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
-  const date = new Date(dateString);
-  return days[date.getDay()];
-}
-
-function toggleDay(cell, group) {
-  const rows = document.querySelectorAll(`.group-${group}`);
-  rows.forEach(row => {
-    row.classList.toggle('hidden-row');
-  });
-  cell.innerHTML = cell.innerHTML.includes('▶️') ?
-    cell.innerHTML.replace('▶️', '▼') :
-    cell.innerHTML.replace('▼', '▶️');
-}
-
-const moonPhaseLabels = ["Nov", "Dorůstající srpek", "První čtvrť", "Dorůstající Měsíc", "Úplněk", "Couvající Měsíc", "Poslední čtvrť", "Ubývající srpek"];
-function getMoonPhase(date) {
-  const lp = 2551443;
-  const now = new Date(date);
-  const new_moon = new Date(2001,0,24,13,35);
-  const phase = ((now.getTime() - new_moon.getTime()) / 1000) % lp;
-  const age = Math.floor(phase / (24*3600));
-  if (age < 1 || age >= 29) return ['🌑', 'Nov'];
-  else if (age < 7) return ['🌒', 'Dorůstající srpek'];
-  else if (age < 10) return ['🌓', 'První čtvrť'];
-  else if (age < 14) return ['🌔', 'Dorůstající Měsíc'];
-  else if (age < 17) return ['🌕', 'Úplněk'];
-  else if (age < 21) return ['🌖', 'Couvající Měsíc'];
-  else if (age < 25) return ['🌗', 'Poslední čtvrť'];
-  else return ['🌘', 'Ubývající srpek'];
-}
-
-function getSimpleTimeEmoji(hour, dateStr) {
-  const sunrise = sunriseTimes[dateStr]?.split(':')[0];
-  const sunset = sunsetTimes[dateStr]?.split(':')[0];
-  if (!sunrise || !sunset) return '⏳';
-  return (hour >= +sunrise && hour < +sunset) ? '🌞' : '🌙';
-}
-
-let sunriseTimes = {}, sunsetTimes = {};
-
-async function fetchForecast(lat, lon) {
-  try {
-    document.getElementById('loading-spinner').style.display = 'block';
-    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&daily=sunrise,sunset&timezone=Europe/Prague`);
-    if (!response.ok) throw new Error('HTTP chyba: ' + response.status);
-    const data = await response.json();
-
-    sunriseTimes = {}, sunsetTimes = {};
-    (data.daily.sunrise || []).forEach(sun => { const [d, t] = sun.split('T'); sunriseTimes[d] = t; });
-    (data.daily.sunset || []).forEach(sun => { const [d, t] = sun.split('T'); sunsetTimes[d] = t; });
-
-    const { time: times = [], temperature_2m: temps = [], cloudcover: clouds = [], precipitation: rain = [], windspeed_10m: wind = [] } = data.hourly || {};
-    const tbody = document.querySelector('#forecast tbody');
-    tbody.innerHTML = '';
-
-    let currentDay = '';
-    let group = 0;
-
-    for (let i = 0; i < Math.min(times.length, 168); i++) {
-      const [datePart, timePart] = times[i]?.split('T') || ['',''];
-      const dayName = getDayName(datePart);
-      const hour = parseInt(timePart?.split(':')[0], 10);
-      const emoji = getSimpleTimeEmoji(hour, datePart);
-
-      if (dayName !== currentDay) {
-        currentDay = dayName;
-        group++;
-        const [moonEmoji, moonLabel] = getMoonPhase(datePart);
-        const sunriseText = sunriseTimes[datePart] ? `Východ slunce ${sunriseTimes[datePart]}` : 'N/A';
-        const sunsetText = sunsetTimes[datePart] ? `Západ slunce ${sunsetTimes[datePart]}` : 'N/A';
-        const dayRow = document.createElement('tr');
-        dayRow.className = 'day-row';
-        dayRow.innerHTML = `<td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">▶️ 📅 ${dayName} - ${sunriseText} / ${sunsetText} <span title="Fáze Měsíce: ${moonLabel}">${moonEmoji}</span></td>`;
-        tbody.appendChild(dayRow);
-      }
-
-      let cloudClass = '';
-      if (clouds[i] <= 30) cloudClass = 'low-cloud';
-      else if (clouds[i] <= 70) cloudClass = 'medium-cloud';
-      else cloudClass = 'high-cloud';
-
-      const row = document.createElement('tr');
-      row.className = `${cloudClass.trim()} group-${group}`;
-      row.innerHTML = `
-        <td>🕒 ${timePart}</td>
-        <td>${emoji}</td>
-        <td>🌡️ ${temps[i] ?? 'N/A'}</td>
-        <td>☁️ ${clouds[i] ?? 'N/A'}</td>
-        <td>🌧️ ${rain[i] ?? 'N/A'}</td>
-        <td>💨 ${wind[i] ?? 'N/A'}</td>
-      `;
-      tbody.appendChild(row);
-    }
-  } catch (error) {
-    console.error('Chyba při načítání předpovědi:', error);
-    alert('Nepodařilo se načíst předpověď.');
-  } finally {
-    document.getElementById('loading-spinner').style.display = 'none';
-  }
 }
 </script>
 
