@@ -6,7 +6,6 @@
   <title>Astronomická předpověď</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* --- Moderní CSS styly --- */
     * { box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
@@ -14,11 +13,20 @@
       padding: 20px;
       margin: 0;
       color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+      background-color: #121212;
+      color: #eee;
     }
     h1, h2 {
       text-align: center;
       margin-bottom: 15px;
-      color: #222;
+      color: inherit;
+    }
+    .theme-toggle {
+      text-align: center;
+      margin-bottom: 20px;
     }
     .controls {
       background: white;
@@ -31,6 +39,10 @@
       gap: 10px;
       align-items: center;
       justify-content: center;
+      transition: background 0.3s;
+    }
+    body.dark-mode .controls {
+      background: #1e1e1e;
     }
     .input-container {
       flex: 1 1 250px;
@@ -43,11 +55,12 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, background 0.3s, color 0.3s;
     }
-    input[type="text"]:focus {
-      border-color: #007bff;
-      outline: none;
+    body.dark-mode input[type="text"] {
+      background: #333;
+      color: #eee;
+      border-color: #555;
     }
     button {
       background-color: #007bff;
@@ -88,6 +101,12 @@
       z-index: 10;
       display: none;
       border-radius: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode #suggestions {
+      background: #333;
+      color: #eee;
+      border-color: #555;
     }
     #suggestions li {
       padding: 10px;
@@ -97,7 +116,6 @@
     #suggestions li:hover, #suggestions li.active {
       background-color: #007bff;
       color: white;
-      border-radius: 8px;
     }
     #forecast {
       background: white;
@@ -105,6 +123,10 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       overflow-x: auto;
+      transition: background 0.3s;
+    }
+    body.dark-mode #forecast {
+      background: #1e1e1e;
     }
     table {
       width: 100%;
@@ -116,13 +138,21 @@
       border-bottom: 1px solid #eee;
       text-align: center;
     }
+    body.dark-mode th, body.dark-mode td {
+      border-color: #444;
+    }
     tr:hover {
       background-color: #f9fafc;
+    }
+    body.dark-mode tr:hover {
+      background-color: #2a2a2a;
     }
     .day-row {
       background-color: #dfe6ed;
       font-weight: bold;
-      cursor: pointer;
+    }
+    body.dark-mode .day-row {
+      background-color: #333;
     }
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
@@ -157,6 +187,11 @@
 
 <h1>Astronomická předpověď</h1>
 <h2 id="cityDisplay"></h2>
+
+<div class="theme-toggle">
+  <button onclick="toggleTheme()">🌙 Přepnout režim</button>
+</div>
+
 <div id="loading-spinner"><div class="spinner"></div></div>
 
 <div class="controls">
@@ -176,13 +211,22 @@
 </div>
 
 <script>
-// JavaScript opravený a přidán zpět
+// === Přepínání tématu ===
+function toggleTheme() {
+  document.body.classList.toggle("dark-mode");
+}
 
+// === Globální proměnné ===
+let sunriseTimes = {}, sunsetTimes = {};
+let selectedCity = null;
+
+// === Získání názvu dne ===
 function getDayName(dateString) {
   const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
   return days[new Date(dateString).getDay()];
 }
 
+// === Přepínání jednotlivých dnů ===
 function toggleDay(cell, group) {
   const rows = document.querySelectorAll(`.group-${group}`);
   rows.forEach(row => row.classList.toggle('hidden-row'));
@@ -191,6 +235,7 @@ function toggleDay(cell, group) {
     cell.innerHTML.replace('▼', '▶️');
 }
 
+// === Emoji den/noc ===
 function getSimpleTimeEmoji(hour, dateStr) {
   const sunrise = sunriseTimes[dateStr]?.split(':')[0];
   const sunset = sunsetTimes[dateStr]?.split(':')[0];
@@ -198,13 +243,13 @@ function getSimpleTimeEmoji(hour, dateStr) {
   return (hour >= +sunrise && hour < +sunset) ? '🌞' : '🌙';
 }
 
-const moonPhaseLabels = ["Nov", "Dorůstající srpek", "První čtvrť", "Dorůstající Měsíc", "Úplněk", "Couvající Měsíc", "Poslední čtvrť", "Ubývající srpek"];
+// === Fáze Měsíce ===
 function getMoonPhase(date) {
   const lp = 2551443;
   const now = new Date(date);
-  const new_moon = new Date(2001, 0, 24, 13, 35);
+  const new_moon = new Date(2001,0,24,13,35);
   const phase = ((now.getTime() - new_moon.getTime()) / 1000) % lp;
-  const age = Math.floor(phase / (24 * 3600));
+  const age = Math.floor(phase / (24*3600));
   if (age < 1 || age >= 29) return ['🌑', 'Nov'];
   else if (age < 7) return ['🌒', 'Dorůstající srpek'];
   else if (age < 10) return ['🌓', 'První čtvrť'];
@@ -215,9 +260,7 @@ function getMoonPhase(date) {
   else return ['🌘', 'Ubývající srpek'];
 }
 
-let sunriseTimes = {}, sunsetTimes = {};
-let selectedCity = null;
-
+// === Načíst předpověď ===
 async function fetchForecast(lat, lon) {
   try {
     document.getElementById('loading-spinner').style.display = 'block';
@@ -237,7 +280,7 @@ async function fetchForecast(lat, lon) {
     let group = 0;
 
     for (let i = 0; i < Math.min(time.length, 168); i++) {
-      const [datePart, timePart] = time[i]?.split('T') || ['', ''];
+      const [datePart, timePart] = time[i]?.split('T') || ['',''];
       const dayName = getDayName(datePart);
       const hour = parseInt(timePart?.split(':')[0], 10);
       const emoji = getSimpleTimeEmoji(hour, datePart);
@@ -309,6 +352,7 @@ async function fetchForecast(lat, lon) {
   }
 }
 
+// === Vyhledávání měst ===
 async function autocompleteCities() {
   const input = document.getElementById('cityInput').value.trim();
   const suggestions = document.getElementById('suggestions');
