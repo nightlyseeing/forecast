@@ -157,6 +157,21 @@
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
     .high-cloud { background-color: #f8d7da; }
+
+    /* === ZVÝŠENÍ KONTRASTU PRO NOČNÍ REŽIM === */
+    body.dark-mode .low-cloud {
+      background-color: #264d39;
+      color: #d4edda;
+    }
+    body.dark-mode .medium-cloud {
+      background-color: #4d4426;
+      color: #fff3cd;
+    }
+    body.dark-mode .high-cloud {
+      background-color: #4d2626;
+      color: #f8d7da;
+    }
+
     .hidden-row { display: none; }
     #loading-spinner {
       display: none;
