@@ -102,18 +102,24 @@
     }
 
     tr:hover { background-color: #f1f1f1; }
-    .day-row { background-color: #e2e3e5; font-weight: bold; text-align: left; }
+    .day-row { background-color: #e2e3e5; font-weight: bold; }
     .day-cell {
       padding: 12px;
       line-height: 1.6;
       font-size: 15px;
+      text-align: left;
     }
 
     .low-cloud { background-color: #d4edda; }
     .medium-cloud { background-color: #fff3cd; }
     .high-cloud { background-color: #f8d7da; }
     .hidden-row { display: none; }
-    #loading-spinner { font-size: 18px; margin-bottom: 10px; }
+
+    #loading-spinner {
+      font-size: 18px;
+      margin-bottom: 10px;
+      display: none; /* změněno z původního zobrazení */
+    }
 
     @media (max-width: 600px) {
       th, td { font-size: 13px; padding: 6px; }
@@ -155,7 +161,6 @@
 </div>
 
 <script>
-// Pomocné funkce
 function getDayName(dateString) {
   const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
   return days[new Date(dateString).getDay()];
@@ -239,8 +244,10 @@ async function fetchForecast(lat, lon) {
         const dayRow = document.createElement('tr');
         dayRow.className = 'day-row';
         dayRow.innerHTML = `
-          <td colspan="6" class="day-cell" onclick="toggleDay(this, ${group})">
-            ▶️ 📅 ${dayName} (${datePart})<br>
+          <td class="day-cell" onclick="toggleDay(this, ${group})">
+            ▶️ 📅 ${dayName}<br>(${datePart})
+          </td>
+          <td colspan="5" class="day-cell">
             ☀️ Východ: ${sunrise} / Západ: ${sunset}<br>
             🌕 Fáze Měsíce: ${moonEmoji} ${moonLabel}<br>
             🕰️ Délka dne: ${dayLength}
@@ -273,7 +280,6 @@ async function fetchForecast(lat, lon) {
   }
 }
 
-// Vyhledávání a GPS
 let selectedCity = null;
 
 async function autocompleteCities() {
@@ -317,7 +323,7 @@ async function autocompleteCities() {
 function handleSuggestionKeys(event) {
   const suggestions = Array.from(document.querySelectorAll('#suggestions li'));
   let index = suggestions.findIndex(el => el.classList.contains('active'));
-  
+
   if (event.key === 'ArrowDown') {
     event.preventDefault();
     if (index < suggestions.length - 1) {
