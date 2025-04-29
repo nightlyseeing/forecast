@@ -253,6 +253,16 @@ async function fetchForecast(lat, lon) {
             🕰️ Délka dne: ${dayLength}
           </td>`;
         tbody.appendChild(dayRow);
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+          <th>🕒 Čas</th>
+          <th>🌗 Den/Noc</th>
+          <th>🌡️ Teplota (°C)</th>
+          <th>☁️ Oblačnost (%)</th>
+          <th>🌧️ Srážky (mm)</th>
+          <th>💨 Vítr (km/h)</th>
+`;
+tbody.appendChild(headerRow);
       }
 
       let cloudClass = '';
