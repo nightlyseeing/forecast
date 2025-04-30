@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -76,37 +77,35 @@
       background-color: #0056b3;
       transform: translateY(-2px);
     }
-    .clear-button {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: #888;
-      display: none;
-      cursor: pointer;
-      z-index: 10;
-      padding: 0;
-      line-height: 1;
+   .clear-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    display: none;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
     }
     .clear-button:hover { color: #000; }
-
-    #suggestions {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      width: 100%;
-      background: white;
-      border: 1px solid #ccc;
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 1000;
-      display: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+   #suggestions {
+     position: absolute;
+     top: calc(100% + 4px); /* mírný odstup pod inputem */
+     left: 0;
+     width: 100%;
+     background: white;
+     border: 1px solid #ccc;
+     max-height: 200px;
+     overflow-y: auto;
+     z-index: 1000;
+     display: none;
+     border-radius: 8px;
+     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+   }
     body.dark-mode #suggestions {
       background: #333;
       color: #eee;
@@ -121,40 +120,96 @@
       background-color: #007bff;
       color: white;
     }
+    #forecast {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+      transition: background 0.3s;
+    }
+    body.dark-mode #forecast {
+      background: #1e1e1e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
+    body.dark-mode th, body.dark-mode td {
+      border-color: #444;
+    }
+    tr:hover {
+      background-color: #f9fafc;
+    }
+    body.dark-mode tr:hover {
+      background-color: #2a2a2a;
+    }
+    .day-row {
+      background-color: #dfe6ed;
+      font-weight: bold;
+    }
+    body.dark-mode .day-row {
+      background-color: #333;
+    }
+    .low-cloud { background-color: #d4edda; }
+    .medium-cloud { background-color: #fff3cd; }
+    .high-cloud { background-color: #f8d7da; }
 
-    .mobile-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
+    /* === ZVÝŠENÍ KONTRASTU PRO NOČNÍ REŽIM === */
+    body.dark-mode .low-cloud {
+      background-color: #264d39;
+      color: #d4edda;
+    }
+    body.dark-mode .medium-cloud {
+      background-color: #4d4426;
+      color: #fff3cd;
+    }
+    body.dark-mode .high-cloud {
+      background-color: #4d2626;
+      color: #f8d7da;
     }
 
-    /* Další styly (forecast, tabulka...) zůstávají beze změny */
-
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .input-container {
-        width: 100%;
-      }
-      th, td {
-        font-size: 14px;
-      }
-      .clear-button {
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-      #suggestions {
-        width: 100%;
-        left: 0;
-      }
+    .hidden-row { display: none; }
+    #loading-spinner {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
     }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+   @media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .input-container {
+    width: 100%;
+  }
+  th, td {
+    font-size: 14px;
+  }
+}
   </style>
 </head>
+
 <body>
 
 <h1>Astronomická předpověď</h1>
