@@ -90,19 +90,19 @@
     }
     .clear-button:hover { color: #000; }
     #suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      border: 1px solid #ccc;
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 10;
-      display: none;
-      border-radius: 8px;
-      transition: background 0.3s, color 0.3s;
-    }
+   position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  border-radius: 8px;
+  margin-top: 4px; /* trochu oddělíme od inputu */
+}
     body.dark-mode #suggestions {
       background: #333;
       color: #eee;
