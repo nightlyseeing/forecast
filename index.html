@@ -191,10 +191,19 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    @media (max-width: 600px) {
-      .controls { flex-direction: column; }
-      th, td { font-size: 14px; }
-    }
+   @media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .input-container {
+    width: 100%;
+  }
+  th, td {
+    font-size: 14px;
+  }
+}
   </style>
 </head>
 
