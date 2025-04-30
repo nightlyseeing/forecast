@@ -320,13 +320,18 @@ async function fetchForecast(lat, lon) {
         const dayRow = document.createElement('tr');
         dayRow.className = 'day-row';
         dayRow.innerHTML = `
-         <td class="day-cell" onclick="toggleDay(this, ${group})" colspan="2" style="text-align: left;">
-            ▶️ 📅 ${dayName} (${datePart})<br>
-            ☀️ Východ: ${sunrise} / Západ: ${sunset}<br>
-            🌕 Fáze Měsíce: ${moonEmoji} ${moonLabel}<br>
-            🕰️ Délka dne: ${dayLength}
-         </td>
-        <td colspan="4"></td>`;
+          <td class="day-cell" onclick="toggleDay(this, ${group})" style="text-align: left; white-space: nowrap;">
+          ▶️ 📅 ${dayName}<br>(${datePart})
+          </td>
+          <td colspan="5" style="text-align: left;">
+         <div style="display: flex; gap: 30px;">
+           <div>
+             ☀️ Východ: ${sunrise} / Západ: ${sunset}<br>
+             🌕 Fáze Měsíce: ${moonEmoji} ${moonLabel}<br>
+             🕰️ Délka dne: ${dayLength}
+           </div>
+          </div>
+         </td>`;
         tbody.appendChild(dayRow);
 
         const headerRow = document.createElement('tr');
