@@ -76,33 +76,35 @@
       background-color: #0056b3;
       transform: translateY(-2px);
     }
-    .clear-button {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: #888;
-      display: none;
-      cursor: pointer;
+   .clear-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    display: none;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
     }
     .clear-button:hover { color: #000; }
-    #suggestions {
-   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  border-radius: 8px;
-  margin-top: 4px; /* trochu oddělíme od inputu */
-}
+   #suggestions {
+     position: absolute;
+     top: calc(100% + 4px); /* mírný odstup pod inputem */
+     left: 0;
+     width: 100%;
+     background: white;
+     border: 1px solid #ccc;
+     max-height: 200px;
+     overflow-y: auto;
+     z-index: 1000;
+     display: none;
+     border-radius: 8px;
+     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+   }
     body.dark-mode #suggestions {
       background: #333;
       color: #eee;
