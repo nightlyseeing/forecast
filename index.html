@@ -223,9 +223,13 @@
     <input type="text" id="cityInput" placeholder="Zadejte město (např. Praha)" oninput="autocompleteCities()" onkeydown="handleSuggestionKeys(event)" autocomplete="off">
     <button class="clear-button" id="clearButton" onclick="clearInput()">×</button>
     <ul id="suggestions"></ul>
+    
+    <!-- Přidané tlačítka přímo pod input -->
+    <div class="mobile-buttons">
+      <button id="gpsButton" onclick="getLocation()">📍 Moje poloha</button>
+      <button onclick="manualSearch()">🔍 Zobrazit předpověď</button>
+    </div>
   </div>
-  <button id="gpsButton" onclick="getLocation()">📍 Moje poloha</button>
-  <button onclick="manualSearch()">🔍 Zobrazit předpověď</button>
 </div>
 
 <div id="forecast">
