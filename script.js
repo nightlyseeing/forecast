@@ -1,5 +1,5 @@
 // JS přesunutý ze <script> v HTML
-<script>
+// <script>
 // === Přepínání tématu ===
 function toggleTheme() {
   document.body.classList.toggle("dark-mode");
@@ -231,5 +231,5 @@ function getLocation() {
     alert('Nepodařilo se získat polohu.');
   });
 }
-</script>
+// </script>
 // ... sem přijde celý JavaScript ...
