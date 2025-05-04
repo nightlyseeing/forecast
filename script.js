@@ -1,0 +1,3 @@
+// JS přesunutý ze <script> v HTML
+
+// ... sem přijde celý JavaScript ...
