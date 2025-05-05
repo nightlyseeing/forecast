@@ -36,3 +36,4 @@ function fetchMoonPhase(lat, lon) {
   if (old) old.remove();
   container.appendChild(moonInfo);
 }
+
