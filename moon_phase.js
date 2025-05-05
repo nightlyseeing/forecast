@@ -30,8 +30,6 @@ function fetchMoonPhase(lat, lon) {
   moonInfo.className = "moon-dynamic";
   moonInfo.innerHTML = `
     <div><strong>Fáze Měsíce:</strong> ${icon} ${name}</div>
-    <div><strong>Východ:</strong> -</div>
-    <div><strong>Západ:</strong> -</div>
   `;
 
   const old = container.querySelector('.moon-dynamic');
