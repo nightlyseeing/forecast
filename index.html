@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astronomická předpověď</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+      margin: 0;
+    }
+    h1, h2 { text-align: center; }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    #cityInput {
+      padding: 10px 35px 10px 10px;
+      width: 300px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      color: #ccc;
+      display: none;
+      line-height: 1;
+    }
+    .controls button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #2979ff;
+      color: white;
+      cursor: pointer;
+    }
+    .controls button:hover { background: #1565c0; }
+    #suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 8px;
+      width: 100%;
+      list-style: none;
+      padding: 0;
+      margin-top: 5px;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    #suggestions li {
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #suggestions li:hover {
+      background-color: #2979ff;
+      color: white;
+    }
+    .layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .map-container {
+      flex: 1 1 40%;
+      min-width: 300px;
+    }
+    #map {
+      aspect-ratio: 1 / 1;
+      height: auto;
+      border-radius: 10px;
+    }
+    .info-container {
+      flex: 1 1 55%;
+    }
+    .moon-phase {
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+    .forecast-day {
+      margin-bottom: 10px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background: #1e1e1e;
+    }
+    .forecast-day h3 {
+      margin: 0;
+      padding: 10px;
+      cursor: pointer;
+      background: #2979ff;
+      color: white;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+    }
+    .forecast-content { display: none; padding: 10px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+    .spinner {
+      display: none;
+      margin: 0 auto;
+      border: 8px solid #333;
+      border-top: 8px solid #2979ff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Astronomická předpověď</h1>
+  <h2 id="cityDisplay">Zadejte město nebo použijte GPS</h2>
+
+  <div class="controls">
+    <div class="input-wrapper">
+      <input type="text" id="cityInput" placeholder="Zadejte město..." oninput="autocompleteCities(); document.querySelector('.clear-btn').style.display = this.value ? 'block' : 'none';" />
+      <button class="clear-btn" onclick="document.getElementById('cityInput').value=''; this.style.display='none'; document.getElementById('suggestions').style.display='none';">×</button>
+      <ul id="suggestions"></ul>
+    </div>
+    <button onclick="manualSearch()">🔍 Vyhledat</button>
+    <button onclick="getLocation()">📍 Moje poloha</button>
+  </div>
+
+  <div class="layout">
+    <div class="info-container">
+      <div class="moon-phase" id="locationInfoBox">
+        <strong><u><span style="font-size: 1.2em;">Informace o místě:</span></u></strong>
+        <div><strong>Název:</strong> <span id="info-name">-</span></div>
+        <div><strong>GPS:</strong> <span id="info-gps">-</span></div>
+      </div>
+      <div class="spinner" id="spinner"></div>
+      <div id="forecast"></div>
+    </div>
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script>
+    let selectedCity = null;
+    let map = null;
+    let marker = null;
+
+    function toggleForecast(dayId) {
+      const content = document.getElementById(dayId);
+      const icon = document.getElementById(dayId + '-icon');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.textContent = '⬆️';
+      } else {
+        content.style.display = 'none';
+        icon.textContent = '⬇️';
+      }
+    }
+
+    function showSpinner(show) {
+      document.getElementById('spinner').style.display = show ? 'block' : 'none';
+    }
+
+    function getWeatherIcon(cloud, rain) {
+      if (rain > 2) return '🌧️';
+      if (rain > 0) return '🌦️';
+      if (cloud > 75) return '☁️';
+      if (cloud > 25) return '🌤️';
+      return '☀️';
+    }
+
+    function getDayName(dateStr) {
+      const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+      const date = new Date(dateStr);
+      return days[date.getDay()];
+    }
+
+    async function autocompleteCities() {
+      const input = document.getElementById('cityInput').value.trim();
+      const suggestions = document.getElementById('suggestions');
+      if (input.length < 2) return suggestions.style.display = 'none';
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=5&language=cs&format=json`);
+      const data = await res.json();
+      suggestions.innerHTML = '';
+      (data.results || []).forEach(city => {
+        const li = document.createElement('li');
+        li.textContent = `${city.name}, ${city.country}`;
+        li.onclick = () => {
+          selectedCity = city;
+          document.getElementById('cityInput').value = `${city.name}, ${city.country}`;
+          document.getElementById('cityDisplay').textContent = `${city.name}, ${city.country}`;
+          suggestions.style.display = 'none';
+          initMap(city.latitude, city.longitude);
+          fetchForecast(city.latitude, city.longitude);
+          updateLocationInfo(city);
+        };
+        suggestions.appendChild(li);
+      });
+      suggestions.style.display = 'block';
+    }
+
+    async function manualSearch() {
+      const input = document.getElementById('cityInput').value.trim();
+      if (!input) return alert("Zadejte město");
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=1&language=cs&format=json`);
+      const data = await res.json();
+      if (!data.results || !data.results.length) return alert("Město nenalezeno.");
+      selectedCity = data.results[0];
+      document.getElementById('cityDisplay').textContent = `${selectedCity.name}, ${selectedCity.country}`;
+      initMap(selectedCity.latitude, selectedCity.longitude);
+      fetchForecast(selectedCity.latitude, selectedCity.longitude);
+      updateLocationInfo(selectedCity);
+    }
+
+    async function getLocation() {
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const name = await reverseGeocode(lat, lon);
+        initMap(lat, lon);
+        fetchForecast(lat, lon);
+        updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
+      }, err => alert("Nepodařilo se zjistit polohu."));
+    }
+
+    async function reverseGeocode(lat, lon) {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+        const data = await res.json();
+        const name = data.address?.city || data.address?.town || data.address?.village || data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        document.getElementById('cityDisplay').textContent = name;
+        return name;
+      } catch {
+        const fallback = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        document.getElementById('cityDisplay').textContent = fallback;
+        return fallback;
+      }
+    }
+
+    function initMap(lat, lon) {
+      if (!map) {
+        map = L.map('map', { scrollWheelZoom: false }).setView([lat, lon], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+        marker = L.marker([lat, lon]).addTo(map);
+      } else {
+        map.setView([lat, lon], 10);
+        marker.setLatLng([lat, lon]);
+      }
+    }
+
+    async function fetchForecast(lat, lon) {
+      showSpinner(true);
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+      const data = await res.json();
+      showSpinner(false);
+      const { time, temperature_2m, cloudcover, precipitation, windspeed_10m } = data.hourly;
+      const forecastDiv = document.getElementById('forecast');
+      forecastDiv.innerHTML = '';
+
+      const days = {};
+      for (let i = 0; i < time.length; i++) {
+        const [date, hour] = time[i].split('T');
+        if (!days[date]) days[date] = [];
+        days[date].push({
+          time: hour,
+          temp: temperature_2m[i],
+          cloud: cloudcover[i],
+          rain: precipitation[i],
+          wind: windspeed_10m[i]
+        });
+      }
+
+      Object.entries(days).forEach(([date, entries], idx) => {
+        const section = document.createElement('div');
+        section.className = 'forecast-day';
+
+        const header = document.createElement('h3');
+        const contentId = `day-${idx}`;
+        const dayName = getDayName(date);
+        header.innerHTML = `<span id="${contentId}-icon">⬇️</span> ${dayName}, ${date}`;
+        header.onclick = () => toggleForecast(contentId);
+        section.appendChild(header);
+
+        const content = document.createElement('div');
+        content.className = 'forecast-content';
+        content.id = contentId;
+
+        const table = document.createElement('table');
+        table.innerHTML = '<tr><th>Čas</th><th>Počasí</th><th>Teplota</th><th>Oblačnost</th><th>Srážky</th><th>Vítr</th></tr>';
+
+        entries.forEach(e => {
+          const row = document.createElement('tr');
+          const icon = getWeatherIcon(e.cloud, e.rain);
+          row.innerHTML = `<td>${e.time}</td><td>${icon}</td><td>${e.temp}°C</td><td>${e.cloud}%</td><td>${e.rain} mm</td><td>${e.wind} km/h</td>`;
+          table.appendChild(row);
+        });
+
+        content.appendChild(table);
+        section.appendChild(content);
+        forecastDiv.appendChild(section);
+      });
+    }
+
+    function updateLocationInfo(city) {
+      document.getElementById('info-name').textContent = `${city.name}, ${city.country}`;
+      document.getElementById('info-gps').textContent = `${city.latitude.toFixed(4)}, ${city.longitude.toFixed(4)}`;
+    }
+  </script>
+</body>
+</html>
