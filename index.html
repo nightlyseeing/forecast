@@ -235,7 +235,67 @@
     @keyframes spin {
       100% { transform: rotate(360deg); }
     }
-  </style>
+  
+    .forecast-scroll {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+    .forecast-card {
+      min-width: 100px;
+      background: #2c2f33;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .forecast-card span {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .layout {
+      display: flex;
+      gap: 20px;
+      height: 80vh;
+      align-items: stretch;
+    }
+
+    .info-container {
+      flex: 1 1 55%;
+      overflow-y: auto;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-container {
+      flex: 1 1 40%;
+      min-width: 300px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+    }
+
+    #locationInfoBox {
+      position: sticky;
+      top: 0;
+      background: var(--panel-bg);
+      z-index: 10;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 10px;
+    }
+
+</style>
 </head>
 <body>
   <div class="starry-bg"></div>
@@ -340,6 +400,7 @@
     if (!data.results || !data.results.length) return alert("Město nenalezeno.");
     selectedCity = data.results[0];
     document.getElementById('cityDisplay').textContent = `${selectedCity.name}, ${selectedCity.country}`;
+    console.log('Manuálně zadané město:', selectedCity);
     initMap(selectedCity.latitude, selectedCity.longitude);
     fetchForecast(selectedCity.latitude, selectedCity.longitude);
     fetchMoonPhase(selectedCity.latitude, selectedCity.longitude);
@@ -351,7 +412,9 @@
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
       const name = await reverseGeocode(lat, lon);
+      console.log('Lokace nalezena:', name);
       initMap(lat, lon);
+      updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
       fetchForecast(lat, lon);
       fetchMoonPhase(lat, lon);
       updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
@@ -362,7 +425,7 @@
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
       const data = await res.json();
-      const name = data.address?.city || data.address?.town || data.address?.village || data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+      const name = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
       document.getElementById('cityDisplay').textContent = name;
       return name;
     } catch {
@@ -415,34 +478,51 @@
       const header = document.createElement('h3');
       const contentId = `day-${idx}`;
       const dayName = getDayName(date);
-      header.innerHTML = `<span id="${contentId}-icon">⬇️</span> ${dayName}, ${date}`;
+      header.innerHTML = `<span id="${contentId}-icon">⬆️</span> ${dayName}, ${date}`;
       header.onclick = () => toggleForecast(contentId);
       section.appendChild(header);
 
       const content = document.createElement('div');
       content.className = 'forecast-content';
       content.id = contentId;
+      content.style.display = 'block';
 
-      const table = document.createElement('table');
-      table.innerHTML = '<tr><th>Čas</th><th>Počasí</th><th>Teplota</th><th>Oblačnost</th><th>Srážky</th><th>Vítr</th></tr>';
+      
+      const scrollContainer = document.createElement('div');
+      scrollContainer.className = 'forecast-scroll';
 
       entries.forEach(e => {
-        const row = document.createElement('tr');
+        const card = document.createElement('div');
+        card.className = 'forecast-card';
         const icon = getWeatherIcon(e.cloud, e.rain);
-        row.innerHTML = `<td>${e.time}</td><td>${icon}</td><td>${e.temp}°C</td><td>${e.cloud}%</td><td>${e.rain} mm</td><td>${e.wind} km/h</td>`;
-        table.appendChild(row);
+        card.innerHTML = `
+          <span><strong>${e.time}</strong></span>
+          <span>${icon}</span>
+          <span>${e.temp}°C</span>
+          <span>☁️ ${e.cloud}%</span>
+          <span>🌧️ ${e.rain} mm</span>
+          <span>💨 ${e.wind} km/h</span>
+        `;
+        scrollContainer.appendChild(card);
       });
 
-      content.appendChild(table);
+      content.appendChild(scrollContainer);
+
       section.appendChild(content);
       forecastDiv.appendChild(section);
     });
   }
 
+  
   function updateLocationInfo(city) {
-    document.getElementById('info-name').textContent = `${city.name}, ${city.country}`;
-    document.getElementById('info-gps').textContent = `${city.latitude.toFixed(4)}, ${city.longitude.toFixed(4)}`;
+    const name = city.name || '-';
+    const country = city.country || '';
+    const lat = typeof city.latitude === 'number' ? city.latitude.toFixed(4) : '-';
+    const lon = typeof city.longitude === 'number' ? city.longitude.toFixed(4) : '-';
+    document.getElementById('info-name').textContent = country ? `${name}, ${country}` : name;
+    document.getElementById('info-gps').textContent = `${lat}, ${lon}`;
   }
+  
 </script>
 <script src="moon_phase.js"></script>
 </body>
