@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -18,14 +19,26 @@
     }
 
     body {
-      font-family: 'Orbitron', sans-serif;
-      background-color: var(--background-dark);
-      color: var(--text-color);
-      padding: 20px;
-      margin: 0;
-      position: relative;
-      overflow-x: hidden;
-    }
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    color: var(--text-color);
+    padding: 20px;
+    margin: 0;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  #cityDisplay {
+    font-size: 1.2em;
+    color: #00ffc3;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #3e5363;
+    border-radius: 10px;
+    padding: 10px 20px;
+    display: inline-block;
+    margin: 10px auto;
+    text-shadow: 0 0 5px #00ffc3;
+  }
 
     .starry-bg {
       position: fixed;
@@ -301,7 +314,7 @@
   <div class="starry-bg"></div>
 
   <h1>Astronomická předpověď</h1>
-  <h2 id="cityDisplay">Zadejte město nebo použijte GPS</h2>
+  <div class="controls"><h2 id="cityDisplay">Zadejte město nebo použijte GPS</h2></div>
 
   <div class="controls">
     <div class="input-wrapper">
