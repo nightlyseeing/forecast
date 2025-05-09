@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="cs">
@@ -16,8 +17,34 @@
     z-index: 9999;
     box-shadow: 0 0 8px rgba(0,255,195,0.6);
   }
-</style>
 
+
+
+#locationInfoBox {
+  font-size: 1.05em;
+  border: 1px solid #00ffc3;
+  box-shadow: 0 0 8px rgba(0,255,195,0.2);
+  padding: 16px;
+  background: rgba(0, 255, 195, 0.03);
+}
+
+#locationInfoBox strong {
+  color: #00ffc3;
+  font-size: 1.2em;
+}
+
+#info-name {
+  font-size: 1.2em;
+  color: #e0e0e0;
+  font-weight: bold;
+  text-shadow: 0 0 3px #00ffc3;
+}
+
+#info-gps {
+  font-size: 1.1em;
+  color: #bbbbbb;
+}
+</style>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Astronomická předpověď</title>
@@ -438,7 +465,6 @@ body {
 </head>
 <body>
 <div class="version-tag">Verze 0.1</div>
-
 <div class="starry-bg"></div>
 <h1 style="font-size:2.2em; text-shadow: 0 0 15px #00ffc3;">🪐 Astronomická předpověď</h1>
 <div class="controls">
@@ -454,9 +480,9 @@ body {
 <!-- Levý sloupec: Info + předpověď -->
 <div class="info-container">
 <div class="moon-phase" id="locationInfoBox">
-<strong><u><span style="font-size: 1.2em;">Informace o místě:</span></u></strong>
-<div><strong>Název:</strong> <span id="info-name">-</span></div>
-<div><strong>GPS:</strong> <span id="info-gps">-</span></div>
+<strong><u><span style="font-size: 1.2em;">📍 Informace o místě</span></u></strong>
+<div><strong>🌆 Název:</strong> <span id="info-name">-</span></div>
+<div><strong>🌐 GPS:</strong> <span id="info-gps">-</span></div>
 </div>
 <div class="spinner" id="spinner"></div>
 <div id="forecast"></div>
@@ -475,6 +501,24 @@ body {
   blocker.addEventListener("click", () => {
     blocker.style.display = "none";
   });
+
+function centerTime(contentId, targetTime) {
+  const scrollContainer = document.querySelector(`#${contentId} .forecast-scroll`);
+  if (!scrollContainer) return;
+  const cards = scrollContainer.querySelectorAll('.forecast-card');
+
+  for (const card of cards) {
+    const time = card.querySelector('span strong')?.textContent;
+    if (time === targetTime) {
+      const containerWidth = scrollContainer.offsetWidth;
+      const cardOffset = card.offsetLeft;
+      const cardWidth = card.offsetWidth;
+      scrollContainer.scrollLeft = cardOffset - (containerWidth / 2) + (cardWidth / 2);
+      break;
+    }
+  }
+}
+
 </script>
 </div>
 </div>
@@ -600,20 +644,39 @@ function getDayName(dateStr) {
     }
   }
 
-  async function fetchForecast(lat, lon) {
-    showSpinner(true);
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
-    const data = await res.json();
-    showSpinner(false);
-    const { time, temperature_2m, cloudcover, precipitation, windspeed_10m } = data.hourly;
-    const forecastDiv = document.getElementById('forecast');
-    forecastDiv.innerHTML = '';
+  
+async function fetchForecast(lat, lon) {
+  showSpinner(true);
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+  const data = await res.json();
+  showSpinner(false);
+  const { time, temperature_2m, cloudcover, precipitation, windspeed_10m } = data.hourly;
+  const forecastDiv = document.getElementById('forecast');
+  forecastDiv.innerHTML = '';
 
-    const days = {};
-    for (let i = 0; i < time.length; i++) {
-      const [date, hour] = time[i].split('T');
-      if (!days[date]) days[date] = [];
-      days[date].push({
+  const days = {};
+
+  for (let i = 0; i < time.length; i++) {
+    const [date, hour] = time[i].split('T');
+    const hourNum = parseInt(hour.split(':')[0]);
+
+    // Hlavní den
+    if (!days[date]) days[date] = [];
+    days[date].push({
+      time: hour,
+      temp: temperature_2m[i],
+      cloud: cloudcover[i],
+      rain: precipitation[i],
+      wind: windspeed_10m[i]
+    });
+
+    // Přidání časů do předchozího dne (pro rozšíření na 36 hodin)
+    if (hourNum < 12) {
+      const prevDate = new Date(date);
+      prevDate.setDate(prevDate.getDate() - 1);
+      const prevDateStr = prevDate.toISOString().split('T')[0];
+      if (!days[prevDateStr]) days[prevDateStr] = [];
+      days[prevDateStr].push({
         time: hour,
         temp: temperature_2m[i],
         cloud: cloudcover[i],
@@ -621,29 +684,41 @@ function getDayName(dateStr) {
         wind: windspeed_10m[i]
       });
     }
+  }
 
-    Object.entries(days).forEach(([date, entries], idx) => {
-      const section = document.createElement('div');
-      section.className = 'forecast-day';
+  
 
-      const header = document.createElement('h3');
-      const contentId = `day-${idx}`;
-      const dayName = getDayName(date);
-      header.innerHTML = `<span id="${contentId}-icon">⬆️</span> ${dayName}, ${date}`;
-      header.onclick = () => toggleForecast(contentId);
-      section.appendChild(header);
+Object.entries(days).forEach(([date, entries], idx) => {
+  // Zobraz den pouze pokud má alespoň jednu hodinu od 12:00 dál
+  if (!entries.some(e => {
+    const h = parseInt(e.time.split(':')[0]);
+    return h >= 12;
+  })) return;
 
-      const content = document.createElement('div');
-      content.className = 'forecast-content';
-      content.id = contentId;
-      content.style.display = 'block';
 
-      
-      const scrollContainer = document.createElement('div');
-      scrollContainer.className = 'forecast-scroll';
+    const section = document.createElement('div');
+    section.className = 'forecast-day';
 
-      
-entries
+    const header = document.createElement('h3');
+    const contentId = `day-${idx}`;
+    const dayName = getDayName(date);
+    header.innerHTML = `
+      <span id="${contentId}-icon">⬆️</span> ${dayName}, ${date}
+      <button onclick="event.stopPropagation(); centerTime('${contentId}', '12:00')">Poledne</button>
+      <button onclick="event.stopPropagation(); centerTime('${contentId}', '23:00')">Půlnoc</button>
+      `;
+    header.onclick = () => toggleForecast(contentId);
+    section.appendChild(header);
+
+    const content = document.createElement('div');
+    content.className = 'forecast-content';
+    content.id = contentId;
+    content.style.display = 'block';
+
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'forecast-scroll';
+
+    entries
       .filter(e => {
         if (date === new Date().toISOString().split('T')[0]) {
           const currentHour = new Date().getHours();
@@ -655,23 +730,34 @@ entries
         const card = document.createElement('div');
         card.className = 'forecast-card';
         const icon = getWeatherIcon(e.cloud, e.rain);
-        card.innerHTML = `
+        
+let qualityColor;
+if (e.cloud <= 25) {
+  qualityColor = 'green';
+} else if (e.cloud <= 75) {
+  qualityColor = 'orange';
+} else {
+  qualityColor = 'red';
+}
+
+card.innerHTML = `
           <span><strong>${e.time}</strong></span>
           <span>${icon}</span>
           <span>${e.temp}°C</span>
           <span>☁️ ${e.cloud}%</span>
           <span>🌧️ ${e.rain} mm</span>
           <span>💨 ${e.wind} km/h</span>
-        `;
+          <div style="width: 100%; height: 8px; background-color: ${qualityColor}; border-radius: 4px; margin-top: 4px;"></div>
+    `;
         scrollContainer.appendChild(card);
       });
 
-      content.appendChild(scrollContainer);
+    content.appendChild(scrollContainer);
+    section.appendChild(content);
+    forecastDiv.appendChild(section);
+  });
+}
 
-      section.appendChild(content);
-      forecastDiv.appendChild(section);
-    });
-  }
 
   
   function updateLocationInfo(city) {
