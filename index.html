@@ -1,13 +1,28 @@
 <!DOCTYPE html>
+
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Astronomická předpověď</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
+<style>
+  .version-tag {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #00ffc3;
+    color: #000;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    z-index: 9999;
+    box-shadow: 0 0 8px rgba(0,255,195,0.6);
+  }
+</style>
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Astronomická předpověď</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
     :root {
       --primary: #4b3f72;
       --secondary: #2e8b57;
@@ -17,15 +32,24 @@
       --text-color: #dcdcdc;
     }
 
-    body {
-    font-family: 'Orbitron', sans-serif;
-    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    color: var(--text-color);
-    padding: 20px;
-    margin: 0;
-    position: relative;
-    overflow-x: hidden;
-  }
+    
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
+  background-size: 400% 400%;
+  animation: gradientShift 60s ease infinite;
+  color: var(--text-color);
+  padding: 20px;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+    
 
   #cityDisplay {
     font-size: 1.2em;
@@ -120,6 +144,8 @@
     }
 
     .controls button {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 255, 195, 0.3);
       padding: 10px;
       border-radius: 8px;
       border: none;
@@ -168,17 +194,18 @@
     }
 
     .map-container {
-      flex: 1 1 25%;
-      min-width: 200px;
-      display: flex;
-      align-items: stretch;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 30%;
+  min-width: 200px;
+}
 
     #map {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-    }
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+}
 
     .info-container {
       flex: 1 1 55%;
@@ -222,7 +249,7 @@
     .forecast-content {
       display: none;
       padding: 10px;
-    }
+      height: auto; overflow: visible; }
 
     table {
       width: 100%;
@@ -275,31 +302,31 @@
 
     .layout {
       display: flex;
+      flex-wrap: nowrap;
       gap: 20px;
-      height: 80vh;
+      height: 90vh;
       align-items: stretch;
     }
 
     .info-container {
-      flex: 1 1 55%;
-      overflow-y: auto;
-      max-height: 100%;
+      width: 70%;
       display: flex;
       flex-direction: column;
     }
 
     .map-container {
-      flex: 1 1 25%;
-      min-width: 200px;
-      display: flex;
-      align-items: stretch;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 30%;
+  min-width: 200px;
+}
 
     #map {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-    }
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+}
 
     #locationInfoBox {
       position: sticky;
@@ -310,44 +337,148 @@
       margin-bottom: 10px;
     }
 
+
+    .layout {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .info-container {
+      flex: 1 1 60%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-container {
+      flex: 1 1 40%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .map-section-item {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .map-section-item iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+  h1 {
+    margin: 10px 0 5px 0;
+    font-size: 1.8em;
+  }
+  .controls {
+    margin-bottom: 10px;
+  }
+  body {
+    padding: 10px;
+  }
+
+  #cityInput {
+    padding: 6px 30px 6px 8px;
+    width: 240px;
+  }
+  .controls button {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 255, 195, 0.3);
+    padding: 6px 10px;
+    font-size: 0.9em;
+  }
+
+  
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
+  background-size: 400% 400%;
+  animation: gradientShift 60s ease infinite;
+  color: var(--text-color);
+  padding: 20px;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+    
+  @keyframes bg-fade {
+    0% { background: radial-gradient(ellipse at bottom, #1b2c45 0%, #0d0f1a 100%); }
+    100% { background: radial-gradient(ellipse at bottom, #223b5f 0%, #151826 100%); }
+  }
+
+  .input-wrapper {
+    box-shadow: 0 0 10px rgba(0,255,195,0.4);
+    border-radius: 10px;
+    background: rgba(0, 255, 195, 0.05);
+    padding: 5px;
+  }
+  #cityInput {
+    font-size: 1em;
+    font-weight: bold;
+    border: 2px solid #00ffc3;
+    background-color: #111;
+    color: #00ffc3;
+    transition: box-shadow 0.3s ease;
+  }
+  #cityInput:focus {
+    outline: none;
+    box-shadow: 0 0 12px #00ffc3;
+  }
 </style>
 </head>
 <body>
-  <div class="starry-bg"></div>
+<div class="version-tag">Verze 0.1</div>
 
-  <h1>Astronomická předpověď</h1>
-  <div class="controls"><h2 id="cityDisplay">Zadejte město nebo použijte GPS</h2></div>
-
-  <div class="controls">
-    <div class="input-wrapper">
-      <input type="text" id="cityInput" placeholder="Zadejte město..." oninput="autocompleteCities(); document.querySelector('.clear-btn').style.display = this.value ? 'block' : 'none';" />
-      <button class="clear-btn" onclick="document.getElementById('cityInput').value=''; this.style.display='none'; document.getElementById('suggestions').style.display='none';">×</button>
-      <ul id="suggestions"></ul>
-    </div>
-    <button onclick="manualSearch()">🔍 Vyhledat</button>
-    <button onclick="getLocation()">📍 Moje poloha</button>
-  </div>
-
-<div class="layout">
-  <!-- Levý sloupec: Info + předpověď -->
-  <div class="info-container">
-    <div class="moon-phase" id="locationInfoBox">
-      <strong><u><span style="font-size: 1.2em;">Informace o místě:</span></u></strong>
-      <div><strong>Název:</strong> <span id="info-name">-</span></div>
-      <div><strong>GPS:</strong> <span id="info-gps">-</span></div>
-    </div>
-    <div class="spinner" id="spinner"></div>
-    <div id="forecast"></div>
-  </div>
-
-  <!-- Pravý sloupec: Mapa -->
-  <div class="map-container">
-    <div id="map"></div>
-  </div>
+<div class="starry-bg"></div>
+<h1 style="font-size:2.2em; text-shadow: 0 0 15px #00ffc3;">🪐 Astronomická předpověď</h1>
+<div class="controls">
+<div class="input-wrapper">
+<input id="cityInput" oninput="autocompleteCities(); document.querySelector('.clear-btn').style.display = this.value ? 'block' : 'none';" placeholder="Zadejte město..." type="text"/>
+<button class="clear-btn" onclick="document.getElementById('cityInput').value=''; this.style.display='none'; document.getElementById('suggestions').style.display='none';">×</button>
+<ul id="suggestions"></ul>
 </div>
-
-
- <script>
+<h2 id="cityDisplay" style="display:none; text-align:center; font-size: 1.5em; color:#00ffc3; text-shadow: 0 0 5px #00ffc3;"></h2>
+<button onclick="getLocation()">📍 Moje poloha</button>
+</div>
+<div class="layout">
+<!-- Levý sloupec: Info + předpověď -->
+<div class="info-container">
+<div class="moon-phase" id="locationInfoBox">
+<strong><u><span style="font-size: 1.2em;">Informace o místě:</span></u></strong>
+<div><strong>Název:</strong> <span id="info-name">-</span></div>
+<div><strong>GPS:</strong> <span id="info-gps">-</span></div>
+</div>
+<div class="spinner" id="spinner"></div>
+<div id="forecast"></div>
+</div>
+<!-- Pravý sloupec: Mapa -->
+<div class="map-container">
+<div class="map-section-item" id="windyWrapper" style="width: 100%; margin-top: 10px; display: none; position: relative;">
+<div id="windyOverlayBlocker" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;"></div>
+<iframe frameborder="0" id="windyFrame" src="https://embed.windy.com/embed2.html?lat=50.08&amp;lon=14.43&amp;zoom=11&amp;level=surface&amp;overlay=satellite&amp;menu=&amp;message=&amp;marker=&amp;calendar=now&amp;type=satellite&amp;location=coordinates&amp;detail=&amp;metricWind=default&amp;metricTemp=default" style="border-radius: 10px; display: block; position:relative; z-index:1;" width="100%">
+</iframe>
+</div>
+<script>
+  // Kliknutím aktivuj interakci, jinak scroll zůstane neaktivní
+  const windyWrapper = document.getElementById("windyWrapper");
+  const blocker = document.getElementById("windyOverlayBlocker");
+  blocker.addEventListener("click", () => {
+    blocker.style.display = "none";
+  });
+</script>
+</div>
+</div>
+<script>
   let selectedCity = null;
   let map = null;
   let marker = null;
@@ -397,9 +528,10 @@ function getDayName(dateStr) {
       const li = document.createElement('li');
       li.textContent = `${city.name}, ${city.country}`;
       li.onclick = () => {
-        selectedCity = city;
-        document.getElementById('cityInput').value = `${city.name}, ${city.country}`;
-        document.getElementById('cityDisplay').textContent = `${city.name}, ${city.country}`;
+  selectedCity = city;
+  document.getElementById('cityInput').value = `${city.name}, ${city.country}`;
+  document.getElementById('cityDisplay').textContent = `${city.name}, ${city.country}`;
+  updateLocationInfo(city);
         suggestions.style.display = 'none';
         initMap(city.latitude, city.longitude);
         fetchForecast(city.latitude, city.longitude);
@@ -547,11 +679,71 @@ entries
     const country = city.country || '';
     const lat = typeof city.latitude === 'number' ? city.latitude.toFixed(4) : '-';
     const lon = typeof city.longitude === 'number' ? city.longitude.toFixed(4) : '-';
-    document.getElementById('info-name').textContent = country ? `${name}, ${country}` : name;
+    document.getElementById('info-name').innerHTML = country
+  ? `<span style="color:#00ffc3; font-weight:bold;">${name}</span>, ${country}`
+  : `<span style="color:#00ffc3; font-weight:bold;">${name}</span>`;
     document.getElementById('info-gps').textContent = `${lat}, ${lon}`;
   }
   
 </script>
 <script src="moon_phase.js"></script>
-</body>
+<script>
+  function resizeMapToSquare() {
+    const mapDiv = document.getElementById('map');
+    if (mapDiv) {
+      const width = mapDiv.offsetWidth;
+      mapDiv.style.height = `${width}px`;
+      if (window.map) map.invalidateSize();
+    }
+  }
+
+  window.addEventListener('load', resizeMapToSquare);
+  window.addEventListener('resize', resizeMapToSquare);
+</script>
+<script>
+  function updateWindyWidget(lat, lon) {
+    const windy = document.getElementById('windyFrame');
+    if (windy) {
+      windy.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&zoom=11&level=surface&overlay=satellite&menu=&message=&marker=&calendar=now&type=satellite&location=coordinates&detail=&metricWind=default&metricTemp=default`;
+    }
+  }
+
+  function resizeWindyToMatchMap() {
+    const mapDiv = document.getElementById('map');
+    const windyDiv = document.getElementById('windyFrame');
+    if (mapDiv && windyDiv) {
+      const height = mapDiv.offsetHeight;
+      windyDiv.style.height = height + 'px';
+    }
+  }
+
+  window.addEventListener('load', resizeWindyToMatchMap);
+  window.addEventListener('resize', resizeWindyToMatchMap);
+
+  const originalInitMap = window.initMap;
+  window.initMap = function(lat, lon) {
+      updateWindyWidget(lat, lon);
+      setTimeout(resizeWindyToMatchMap, 300);
+      const windyWrap = document.getElementById('windyWrapper');
+      if (windyWrap) windyWrap.style.display = 'block';
+    };
+</script>
+<script>
+function syncMapAndWidgetHeight() {
+  const mapDiv = document.getElementById('map');
+  const windyDiv = document.getElementById('windyFrame');
+  if (mapDiv && windyDiv) {
+    const height = mapDiv.offsetWidth;
+    mapDiv.style.height = height + 'px';
+    windyDiv.style.height = height + 'px';
+  }
+}
+window.addEventListener('load', syncMapAndWidgetHeight);
+window.addEventListener('resize', syncMapAndWidgetHeight);
+</script></body>
 </html>
+<style>
+.controls button:hover {
+  box-shadow: 0 0 12px rgba(0, 255, 195, 0.6);
+}
+</style>
