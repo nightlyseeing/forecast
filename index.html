@@ -1,6 +1,4 @@
-
 <!DOCTYPE html>
-
 <html lang="cs">
 <head>
 <style>
@@ -20,7 +18,27 @@
 
 
 
-#locationInfoBox {
+.info-box {
+  font-size: 1.05em;
+  border: 1px solid #3e5363;
+  box-shadow: 0 0 4px rgba(255,255,255,0.05);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.info-box strong {
+  font-size: 1.2em;
+  color: #00ffc3;
+  text-shadow: 0 0 3px #00ffc3;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.info-box div {
+  margin-bottom: 6px;
+}
   font-size: 1.05em;
   border: 1px solid #00ffc3;
   box-shadow: 0 0 8px rgba(0,255,195,0.2);
@@ -33,12 +51,15 @@
   font-size: 1.2em;
 }
 
+
 #info-name {
-  font-size: 1.2em;
-  color: #e0e0e0;
+  font-size: 1.05em;
+  color: #00ffc3;
   font-weight: bold;
-  text-shadow: 0 0 3px #00ffc3;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: none;
 }
+
 
 #info-gps {
   font-size: 1.1em;
@@ -61,7 +82,7 @@
 
     
 body {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
   background-size: 400% 400%;
   animation: gradientShift 60s ease infinite;
@@ -355,8 +376,28 @@ body {
   border-radius: 10px;
 }
 
-    #locationInfoBox {
-      position: sticky;
+    .info-box {
+  font-size: 1.05em;
+  border: 1px solid #3e5363;
+  box-shadow: 0 0 4px rgba(255,255,255,0.05);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.info-box strong {
+  font-size: 1.2em;
+  color: #00ffc3;
+  text-shadow: 0 0 3px #00ffc3;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.info-box div {
+  margin-bottom: 6px;
+}
+      
       top: 0;
       background: var(--panel-bg);
       z-index: 10;
@@ -422,7 +463,7 @@ body {
 
   
 body {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
   background-size: 400% 400%;
   animation: gradientShift 60s ease infinite;
@@ -462,7 +503,79 @@ body {
     box-shadow: 0 0 12px #00ffc3;
   }
 </style>
-</head>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/astronomy.js"></script><style>
+
+
+
+.scroll-left, .scroll-right {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.05em;
+  padding: 4px 6px;
+  cursor: pointer;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+.forecast-scroll-wrapper {
+  position: relative;
+}
+.forecast-scroll {
+  position: relative;
+}
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+.forecast-scroll-wrapper {
+  position: relative;
+}
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+</style><style>
+
+
+
+.scroll-left, .scroll-right {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.05em;
+  padding: 4px 6px;
+  cursor: pointer;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+.forecast-scroll-wrapper {
+  position: relative;
+}
+.forecast-scroll {
+  position: relative;
+}
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+.forecast-scroll-wrapper {
+  position: relative;
+}
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+    
+.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+</style></head>
 <body>
 <div class="version-tag">Verze 0.1</div>
 <div class="starry-bg"></div>
@@ -478,49 +591,24 @@ body {
 </div>
 <div class="layout">
 <!-- Levý sloupec: Info + předpověď -->
-<div class="info-container">
-<div class="moon-phase" id="locationInfoBox">
-<strong><u><span style="font-size: 1.2em;">📍 Informace o místě</span></u></strong>
+<div class="info-container"><div style="display: flex; gap: 20px; background: var(--panel-bg); align-items: stretch;"><div class="moon-phase" style="font-size: 1.05em; border: 1px solid #00ffc3; box-shadow: 0 0 8px rgba(0,255,195,0.2); padding: 16px; background: rgba(0, 255, 195, 0.03); flex: 1;">
+<strong>📍 Informace o místě</strong>
 <div><strong>🌆 Název:</strong> <span id="info-name">-</span></div>
 <div><strong>🌐 GPS:</strong> <span id="info-gps">-</span></div>
+<div style="margin-top: 8px;">
 </div>
+</div><div class="moon-phase" style="font-size: 1.05em; border: 1px solid #00ffc3; box-shadow: 0 0 8px rgba(0,255,195,0.2); padding: 16px; background: rgba(0, 255, 195, 0.03); flex: 1;">
+<strong>🔭 Astronomické informace</strong>
+<div id="moon-phase-display" style="margin-top: 8px; font-size: 1.05em;">
+<strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span>
+</div><a href="#" id="bortle-link" style="display: none; color:#00ffc3; font-weight:bold; text-decoration:underline;" target="_blank">
+    🌌 Zobrazit Bortleovu třídu
+  </a></div></div><div style="display: flex; gap: 20px;"></div>
 <div class="spinner" id="spinner"></div>
+
 <div id="forecast"></div>
 </div>
 <!-- Pravý sloupec: Mapa -->
-<div class="map-container">
-<div class="map-section-item" id="windyWrapper" style="width: 100%; margin-top: 10px; display: none; position: relative;">
-<div id="windyOverlayBlocker" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;"></div>
-<iframe frameborder="0" id="windyFrame" src="https://embed.windy.com/embed2.html?lat=50.08&amp;lon=14.43&amp;zoom=11&amp;level=surface&amp;overlay=satellite&amp;menu=&amp;message=&amp;marker=&amp;calendar=now&amp;type=satellite&amp;location=coordinates&amp;detail=&amp;metricWind=default&amp;metricTemp=default" style="border-radius: 10px; display: block; position:relative; z-index:1;" width="100%">
-</iframe>
-</div>
-<script>
-  // Kliknutím aktivuj interakci, jinak scroll zůstane neaktivní
-  const windyWrapper = document.getElementById("windyWrapper");
-  const blocker = document.getElementById("windyOverlayBlocker");
-  blocker.addEventListener("click", () => {
-    blocker.style.display = "none";
-  });
-
-function centerTime(contentId, targetTime) {
-  const scrollContainer = document.querySelector(`#${contentId} .forecast-scroll`);
-  if (!scrollContainer) return;
-  const cards = scrollContainer.querySelectorAll('.forecast-card');
-
-  for (const card of cards) {
-    const time = card.querySelector('span strong')?.textContent;
-    if (time === targetTime) {
-      const containerWidth = scrollContainer.offsetWidth;
-      const cardOffset = card.offsetLeft;
-      const cardWidth = card.offsetWidth;
-      scrollContainer.scrollLeft = cardOffset - (containerWidth / 2) + (cardWidth / 2);
-      break;
-    }
-  }
-}
-
-</script>
-</div>
 </div>
 <script>
   let selectedCity = null;
@@ -580,6 +668,7 @@ function getDayName(dateStr) {
         initMap(city.latitude, city.longitude);
         fetchForecast(city.latitude, city.longitude);
         fetchMoonPhase(city.latitude, city.longitude);
+        fetchPlanets(city.latitude, city.longitude);
         updateLocationInfo(city);
       };
       suggestions.appendChild(li);
@@ -612,6 +701,7 @@ function getDayName(dateStr) {
       updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
       fetchForecast(lat, lon);
       fetchMoonPhase(lat, lon);
+      fetchPlanets(lat, lon);
       updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
     }, err => alert("Nepodařilo se zjistit polohu."));
   }
@@ -715,8 +805,28 @@ Object.entries(days).forEach(([date, entries], idx) => {
     content.id = contentId;
     content.style.display = 'block';
 
-    const scrollContainer = document.createElement('div');
-    scrollContainer.className = 'forecast-scroll';
+    
+const wrapper = document.createElement('div');
+wrapper.className = 'forecast-scroll-wrapper';
+wrapper.style.position = 'relative';
+
+const leftBtn = document.createElement('button');
+leftBtn.className = 'scroll-left';
+leftBtn.innerHTML = '◀';
+leftBtn.onclick = () => scrollContainer.scrollBy({ left: -250, behavior: 'smooth' });
+
+const rightBtn = document.createElement('button');
+rightBtn.className = 'scroll-right';
+rightBtn.innerHTML = '▶';
+rightBtn.onclick = () => scrollContainer.scrollBy({ left: 250, behavior: 'smooth' });
+
+const scrollContainer = document.createElement('div');
+scrollContainer.className = 'forecast-scroll';
+
+wrapper.appendChild(leftBtn);
+wrapper.appendChild(scrollContainer);
+wrapper.appendChild(rightBtn);
+
 
     entries
       .filter(e => {
@@ -752,7 +862,7 @@ card.innerHTML = `
         scrollContainer.appendChild(card);
       });
 
-    content.appendChild(scrollContainer);
+    content.appendChild(wrapper);
     section.appendChild(content);
     forecastDiv.appendChild(section);
   });
@@ -760,7 +870,42 @@ card.innerHTML = `
 
 
   
-  function updateLocationInfo(city) {
+  
+function fetchPlanets(lat, lon) {
+  const log = (msg) => document.getElementById("planet-log").textContent = msg;
+
+  try {
+    log(`📍 Poloha: ${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+    const tbody = document.getElementById("planet-table");
+    tbody.innerHTML = "";
+
+    const observer = new Astronomy.Observer(lat, lon, 0);
+    const date = new Date();
+    date.setHours(22, 0, 0, 0);
+
+    const planets = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
+    let anyVisible = false;
+
+    for (const body of planets) {
+      const hor = Astronomy.Horizon(date, observer, body, "normal");
+      if (hor.altitude > 5) {
+        tbody.innerHTML += `<tr><td>${body}</td><td>${hor.altitude.toFixed(1)}</td><td>${hor.azimuth.toFixed(1)}</td></tr>`;
+        anyVisible = true;
+      }
+    }
+
+    if (!anyVisible) {
+      tbody.innerHTML = "<tr><td colspan='3'>Žádné planety nejsou dobře viditelné.</td></tr>";
+    }
+
+    log("✅ Hotovo.");
+  } catch (e) {
+    log("❌ Chyba: " + e.message);
+  }
+}
+
+
+function updateLocationInfo(city) {
     const name = city.name || '-';
     const country = city.country || '';
     const lat = typeof city.latitude === 'number' ? city.latitude.toFixed(4) : '-';
@@ -772,7 +917,6 @@ card.innerHTML = `
   }
   
 </script>
-<script src="moon_phase.js"></script>
 <script>
   function resizeMapToSquare() {
     const mapDiv = document.getElementById('map');
@@ -810,8 +954,8 @@ card.innerHTML = `
   window.initMap = function(lat, lon) {
       updateWindyWidget(lat, lon);
       setTimeout(resizeWindyToMatchMap, 300);
-      const windyWrap = document.getElementById('windyWrapper');
-      if (windyWrap) windyWrap.style.display = 'block';
+      const windyWrap = document.getElementById('windyBlockContainer');
+      if (windyWrap) { windyWrap.style.display = 'block'; windyWrap.style.height = '400px'; console.log('Windy shown'); }
     };
 </script>
 <script>
@@ -826,10 +970,294 @@ function syncMapAndWidgetHeight() {
 }
 window.addEventListener('load', syncMapAndWidgetHeight);
 window.addEventListener('resize', syncMapAndWidgetHeight);
-</script></body>
-</html>
-<style>
-.controls button:hover {
-  box-shadow: 0 0 12px rgba(0, 255, 195, 0.6);
+</script>
+<script>
+  function updateBortleLink(lat, lon) {
+    const link = document.getElementById('bortle-link');
+    if (link && lat && lon) {
+      link.href = `https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;
+           link.style.display = 'inline';
+    }
+  }
+
+  // Extend updateLocationInfo to update the link
+  const originalUpdateLocationInfo = window.updateLocationInfo;
+  window.updateLocationInfo = function(city) {
+    originalUpdateLocationInfo(city);
+    if (city.latitude && city.longitude) {
+      updateBortleLink(city.latitude.toFixed(4), city.longitude.toFixed(4));
+    }
+  }
+</script>
+<script src="moon_phase.js"></script><script>
+function waitForAstronomy(callback) {
+  if (typeof Astronomy !== "undefined") {
+    callback();
+  } else {
+    setTimeout(() => waitForAstronomy(callback), 100);
+  }
 }
-</style>
+
+// Rebind planetary and moon calls to wait for library
+const originalFetchPlanets = window.fetchPlanets;
+window.fetchPlanets = function(lat, lon) {
+  waitForAstronomy(() => originalFetchPlanets(lat, lon));
+};
+
+const originalFetchMoonPhase = window.fetchMoonPhase;
+window.fetchMoonPhase = function(lat, lon) {
+  waitForAstronomy(() => originalFetchMoonPhase(lat, lon));
+};
+</script>
+<script>
+async function fetchMoonPhase(lat, lon) {
+  const apiKey = "781aa2d69af74745906e01cc68c84207";
+  const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const phase = data.moon_phase || "Neznámá fáze";
+    document.getElementById("moon-phase-label").textContent = `${phase} ${getMoonEmojiFromName(phase)}`;
+  } catch (err) {
+    console.error("Chyba při načítání fáze měsíce:", err);
+    document.getElementById("moon-phase-label").textContent = "Chyba načítání";
+  }
+}
+</script>
+<script>
+async function fetchPlanets(lat, lon) {
+  const apiKey = "781aa2d69af74745906e01cc68c84207";
+  const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}`;
+  const log = (msg) => document.getElementById("planet-log").textContent = msg;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const tbody = document.getElementById("planet-table");
+    tbody.innerHTML = "";
+
+    const planets = [
+      { name: "Mercury", altitude: data.mercury_altitude, azimuth: data.mercury_azimuth },
+      { name: "Venus", altitude: data.venus_altitude, azimuth: data.venus_azimuth },
+      { name: "Mars", altitude: data.mars_altitude, azimuth: data.mars_azimuth },
+      { name: "Jupiter", altitude: data.jupiter_altitude, azimuth: data.jupiter_azimuth },
+      { name: "Saturn", altitude: data.saturn_altitude, azimuth: data.saturn_azimuth }
+    ];
+
+    let anyVisible = false;
+
+    for (const planet of planets) {
+      if (planet.altitude > 5) {
+        const row = `<tr><td>${planet.name}</td><td>${parseFloat(planet.altitude).toFixed(1)}</td><td>${parseFloat(planet.azimuth).toFixed(1)}</td></tr>`;
+        tbody.innerHTML += row;
+        anyVisible = true;
+      }
+    }
+
+    if (!anyVisible) {
+      tbody.innerHTML = "<tr><td colspan='3'>Žádné planety nejsou dobře viditelné.</td></tr>";
+    }
+
+    log("✅ Hotovo.");
+  } catch (e) {
+    log("❌ Chyba při načítání planet: " + e.message);
+  }
+}
+</script>
+<script>
+let moonPhasesByDate = {};
+
+async function fetchMoonPhasesForecast(lat, lon) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=moon_phase&timezone=Europe%2FPrague`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const dates = data.daily.time;
+    const phases = data.daily.moon_phase;
+
+    for (let i = 0; i < dates.length; i++) {
+      const phaseValue = phases[i];
+      const emoji = getMoonEmoji(phaseValue);
+      moonPhasesByDate[dates[i]] = emoji;
+    }
+  } catch (err) {
+    console.error("Chyba při načítání měsíčních fází:", err);
+  }
+}
+
+function getMoonEmoji(phase) {
+  if (phase === 0 || phase === 1) return "🌑";       // New Moon
+  if (phase > 0 && phase < 0.25) return "🌒";        // Waxing Crescent
+  if (phase === 0.25) return "🌓";                   // First Quarter
+  if (phase > 0.25 && phase < 0.5) return "🌔";      // Waxing Gibbous
+  if (phase === 0.5) return "🌕";                    // Full Moon
+  if (phase > 0.5 && phase < 0.75) return "🌖";      // Waning Gibbous
+  if (phase === 0.75) return "🌗";                   // Last Quarter
+  return "🌘";                                       // Waning Crescent
+}
+
+// Modify headers to include emoji after forecast data is loaded
+function addMoonPhasesToHeaders() {
+  Object.entries(moonPhasesByDate).forEach(([date, emoji], idx) => {
+    const headerEls = document.querySelectorAll(".forecast-day h3");
+    headerEls.forEach(header => {
+      if (header.textContent.includes(date) && !header.textContent.includes(emoji)) {
+        header.innerHTML = header.innerHTML.replace(date, date + " " + emoji);
+      }
+    });
+  });
+}
+
+// Patch fetchForecast to inject moon phase call
+const originalFetchForecast = window.fetchForecast;
+window.fetchForecast = async function(lat, lon) {
+  await fetchMoonPhasesForecast(lat, lon);
+  await originalFetchForecast(lat, lon);
+  addMoonPhasesToHeaders();
+};
+
+
+
+function getMoonEmojiFromName(name) {
+  const nameLower = name.toLowerCase().replace(/_/g, " ");
+  if (nameLower.includes("new moon")) return "🌑";
+  if (nameLower.includes("waxing crescent")) return "🌒";
+  if (nameLower.includes("first quarter")) return "🌓";
+  if (nameLower.includes("waxing gibbous")) return "🌔";
+  if (nameLower.includes("full moon")) return "🌕";
+  if (nameLower.includes("waning gibbous")) return "🌖";
+  if (nameLower.includes("last quarter")) return "🌗";
+  if (nameLower.includes("waning crescent")) return "🌘";
+  return "🌙";
+}
+
+</script><script>
+function centerTime(contentId, targetTime) {
+  const scrollContainer = document.querySelector(`#${contentId} .forecast-scroll`);
+  if (!scrollContainer) return;
+  const cards = scrollContainer.querySelectorAll('.forecast-card');
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    const strong = card.querySelector('strong');
+    if (!strong) continue;
+    const time = strong.textContent.trim();
+    if (time === targetTime) {
+      const containerWidth = scrollContainer.clientWidth;
+      const cardOffset = card.offsetLeft;
+      const cardWidth = card.offsetWidth;
+      scrollContainer.scrollTo({
+        left: cardOffset - (containerWidth / 2) + (cardWidth / 2),
+        behavior: 'smooth'
+      });
+      break;
+    }
+  }
+}
+</script><script>
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.forecast-scroll-wrapper').forEach(wrapper => {
+    const scrollArea = wrapper.querySelector('.forecast-scroll');
+    const left = wrapper.querySelector('.scroll-left');
+    const right = wrapper.querySelector('.scroll-right');
+
+    let scrollInterval = null;
+
+    function updateArrowVisibility() {
+      const scrollLeft = scrollArea.scrollLeft;
+      const maxScrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth;
+      left.style.display = scrollLeft > 2 ? 'block' : 'none';
+      right.style.display = (maxScrollLeft - scrollLeft) > 2 ? 'block' : 'none';
+    }
+
+    function startScroll(direction) {
+      if (scrollInterval) clearInterval(scrollInterval);
+      scrollInterval = setInterval(() => {
+        scrollArea.scrollBy({ left: direction * 20, behavior: 'auto' });
+        updateArrowVisibility();
+      }, 16);
+    }
+
+    function stopScroll() {
+      if (scrollInterval) clearInterval(scrollInterval);
+      scrollInterval = null;
+    }
+
+    left.addEventListener('mousedown', () => startScroll(-1));
+    right.addEventListener('mousedown', () => startScroll(1));
+    left.addEventListener('mouseup', stopScroll);
+    right.addEventListener('mouseup', stopScroll);
+    left.addEventListener('mouseleave', stopScroll);
+    right.addEventListener('mouseleave', stopScroll);
+
+    left.addEventListener('touchstart', () => startScroll(-1));
+    right.addEventListener('touchstart', () => startScroll(1));
+    left.addEventListener('touchend', stopScroll);
+    right.addEventListener('touchend', stopScroll);
+
+    scrollArea.addEventListener('scroll', updateArrowVisibility);
+    window.addEventListener('resize', () => setTimeout(updateArrowVisibility, 300));
+
+    setTimeout(updateArrowVisibility, 800);
+  });
+});
+
+        updateArrowVisibility();
+      };
+      const start = () => interval = setInterval(step, 20);
+      const stop = () => clearInterval(interval);
+
+      element.addEventListener('mousedown', start);
+      element.addEventListener('mouseup', stop);
+      element.addEventListener('mouseleave', stop);
+      element.addEventListener('touchstart', start);
+      element.addEventListener('touchend', stop);
+    }
+
+    scrollSmooth(left, -1);
+    scrollSmooth(right, 1);
+
+    scrollArea.addEventListener('scroll', updateArrowVisibility);
+    window.addEventListener('resize', () => setTimeout(updateArrowVisibility, 200));
+
+    setTimeout(updateArrowVisibility, 600);
+  });
+});
+
+    });
+
+    right.addEventListener('click', () => {
+      scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
+    });
+
+    // Initial visibility check with delay to allow layout to render
+    setTimeout(updateArrowVisibility, 500);
+  });
+});
+
+      });
+    }
+    if (right && scrollArea) {
+      right.addEventListener('click', () => {
+        scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
+      });
+    }
+  });
+});
+
+      });
+    }
+    if (right && scrollArea) {
+      right.addEventListener('click', () => {
+        scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
+      });
+    }
+  });
+});
+</script></body></html>
