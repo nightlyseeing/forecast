@@ -1,1675 +1,434 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  .version-tag { position: fixed; top: 10px; right: 10px; background: #00ffc3; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; z-index: 9999; box-shadow: 0 0 8px rgba(0,255,195,0.6); }
-
-
-
-.info-box {
-  font-size: 1.05em;
-  border: 1px solid #3e5363;
-  box-shadow: 0 0 4px rgba(255,255,255,0.05);
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.info-box strong {
-  font-size: 1.2em;
-  color: #00ffc3;
-  text-shadow: 0 0 3px #00ffc3;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.info-box div {
-  margin-bottom: 6px;
-}
-  font-size: 1.05em;
-  border: 1px solid #00ffc3;
-  box-shadow: 0 0 8px rgba(0,255,195,0.2);
-  padding: 16px;
-  background: rgba(0, 255, 195, 0.03);
-}
-
-#locationInfoBox strong {
-  color: #00ffc3;
-  font-size: 1.2em;
-}
-
-
-#info-name {
-  font-size: 1.05em;
-  color: #00ffc3;
-  font-weight: bold;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-shadow: none;
-}
-
-
-#info-gps {
-  font-size: 1.1em;
-  color: #bbbbbb;
-}
-
-.weather-emoji { font-size: 2.2em; display: block; margin: 4px 0; }
-
-.mapy-menu {
-  position: fixed;
-  top: 10px;
-  right: 120px;
-  z-index: 9999;
-  font-size: 0.9em;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.mapy-button {
-  background: #00ffc3;
-  color: #000;
-  font-weight: bold;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(0,255,195,0.6);
-}
-.mapy-content {
-  display: none;
-  position: absolute;
-  background-color: #1f2833;
-  min-width: 180px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.6);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.mapy-content a {
-  color: #00ffc3;
-  padding: 10px 16px;
-  text-decoration: none;
-  display: block;
-}
-.mapy-content a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-
-.menu-wrapper { position: fixed; top: 10px; left: 10px; z-index: 9999; font-size: 0.9em; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
-.menu-button {
-  background: #00ffc3;
-  color: #000;
-  font-weight: bold;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(0,255,195,0.6);
-}
-.menu-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: #1f2833;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.6);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.menu-content a, .version-info {
-  color: #00ffc3;
-  padding: 10px 16px;
-  text-decoration: none;
-  display: block;
-}
-.menu-content a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-.submenu {
-  position: relative;
-}
-.submenu-button {
-  background: none;
-  border: none;
-  color: #00ffc3;
-  padding: 10px 16px;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  font-size: 1em;
-}
-.submenu-content {
-  display: none;
-  position: absolute;
-  left: 100%;
-  top: 0;
-  background-color: #1f2833;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
-  border-radius: 8px;
-}
-.submenu-content a {
-  color: #00ffc3;
-  padding: 10px 16px;
-  text-decoration: none;
-  display: block;
-}
-.submenu-content a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-
-.version-tag:hover::after {
-  content: "V.01\A Vyhledání místa\A Předpověď na 7 dní\A Fáze měsíce";
-  white-space: pre;
-  position: absolute;
-  top: 110%;
-  right: 0;
-  background-color: #1f2833;
-  color: #00ffc3;
-  font-size: 0.85em;
-  padding: 8px 10px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,255,195,0.3);
-  z-index: 9999;
-}
-
-.menu-wrapper {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 9999;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.menu-button {
-  background: #00ffc3;
-  color: #000;
-  font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0,255,195,0.6);
-  cursor: pointer;
-  list-style: none;
-}
-
-.menu-content {
-  background-color: #1f2833;
-  padding: 4px 0;
-  border-radius: 8px;
-  margin-top: 6px;
-  min-width: 200px;
-}
-
-.submenu-button {
-  background: none;
-  border: none;
-  color: #00ffc3;
-  padding: 10px 16px;
-  text-align: left;
-  width: 100%;
-  cursor: pointer;
-  font-size: 0.95em;
-  list-style: none;
-}
-
-.submenu-content {
-  padding: 0;
-  margin: 0;
-  background-color: #1f2833;
-  border-top: 1px solid #3e5363;
-  border-radius: 0 0 8px 8px;
-}
-
-.submenu-content a {
-  display: block;
-  padding: 10px 16px;
-  color: #00ffc3;
-  text-decoration: none;
-}
-
-.submenu-content a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-.submenu-group {
-  position: relative;
-}
-.submenu-button {
-  background: none;
-  border: none;
-  color: #00ffc3;
-  padding: 10px 16px;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.95em;
-}
-.submenu-content {
-  display: none;
-  background-color: #1f2833;
-  border-top: 1px solid #3e5363;
-  border-radius: 0 0 8px 8px;
-}
-.submenu-content a {
-  display: block;
-  padding: 10px 16px;
-  color: #00ffc3;
-  text-decoration: none;
-}
-.submenu-content a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-@media (max-width: 600px) {
-  .menu-wrapper {
-    left: 10px;
-    right: 10px;
-    top: 10px;
-    width: calc(100% - 20px);
-  }
-  .menu-button {
-    width: 100%;
-    font-size: 1em;
-  }
-  .menu-content {
-    width: 100%;
-    min-width: unset;
-    border-radius: 10px;
-  }
-  .submenu-button, .submenu-content a {
-    font-size: 1em;
-    padding: 12px 16px;
-  }
-  .version-tag {
-    top: auto;
-    bottom: 10px;
-    left: 10px;
-    right: auto;
-    font-size: 0.8em;
-    padding: 6px 12px;
-  }
-}
-
-.top-bar {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  display: flex;
-  justify-content: space-between;
-  z-index: 9999;
-}
-
-.menu-container {
-  position: relative;
-}
-
-.menu-toggle {
-  background: #00ffc3;
-  color: #000;
-  font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 8px rgba(0,255,195,0.6);
-}
-
-.menu-dropdown {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #1f2833;
-  border-radius: 8px;
-  margin-top: 6px;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
-}
-
-.menu-item {
-  padding: 10px 16px;
-  color: #00ffc3;
-  cursor: pointer;
-}
-
-.menu-item:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-.submenu {
-  display: none;
-  border-top: 1px solid #3e5363;
-}
-
-.submenu a {
-  display: block;
-  padding: 10px 16px;
-  color: #00ffc3;
-  text-decoration: none;
-}
-
-.submenu a:hover {
-  background-color: #2e8b57;
-  color: white;
-}
-
-.version-tag {
-  background: #00ffc3;
-  color: #000;
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.9em;
-  box-shadow: 0 0 8px rgba(0,255,195,0.6);
-}
-</style>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Astronomická předpověď</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Astronomická předpověď – v0.2.2‑p7</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/astronomy.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
-    :root {
-      --primary: #4b3f72;
-      --secondary: #2e8b57;
-      --background-dark: #0b0c10;
-      --panel-bg: #1f2833;
-      --border-color: #3e5363;
-      --text-color: #dcdcdc;
-    }
+  :root { --bg:#0b0c10; --panel:#1f2833; --accent:#00ffc3; --border:#3e5363; --text:#dcdcdc; --shadow:0 0 12px rgba(0,255,195,0.5); --green:#00ff88; --greenFill:rgba(0,255,136,0.22); --red:#ff4d4d; --redFill:rgba(255,77,77,0.22); }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:radial-gradient(ellipse at top,#0b0c1a 0%,#1b2c3a 100%);color:var(--text);padding:16px}
+  h1{margin:8px 0 16px 0;text-align:center;color:#fff;font-size:2.2rem;text-shadow:0 0 18px var(--accent)}
+  /* top bar */
+  .topbar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;z-index:50}
+  .menu-container{position:relative;align-self:flex-start}
+  .menu-toggle{background:var(--accent);color:#000;font-weight:bold;padding:8px 14px;border-radius:10px;cursor:pointer;border:none;box-shadow:var(--shadow)}
+  .menu-dropdown{display:none;position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:220px;box-shadow:0 8px 16px rgba(0,0,0,.6);overflow:visible}
+  .menu-section{padding:6px 0;position:relative}
+  .menu-item,.menu-link{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
+  .menu-item:hover,.menu-link:hover{background:#2e8b57;color:#fff}
+  .submenu{display:none;position:absolute;top:0;left:100%;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:230px;box-shadow:0 8px 16px rgba(0,0,0,.6);}
+  .has-submenu{position:relative}
+  .has-submenu:hover>.submenu{display:block}
+  .version-tag{position:relative;background:var(--accent);color:#000;font-weight:bold;padding:6px 12px;border-radius:12px;box-shadow:var(--shadow)}
+  .version-tag:hover::after{content:"v0.2.2‑p7\\A • Graf se hýbe se sliderem\\A • Dvoubarevný (zelená/červená)\\A • Ostatní beze změn";white-space:pre;position:absolute;top:115%;right:0;background:var(--panel);color:var(--accent);font-size:.9em;padding:10px 12px;border-radius:10px;border:1px solid var(--border);box-shadow:0 0 16px rgba(0,255,195,.4);min-width:320px}
+  .controls{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .input-wrapper{position:relative}
+  #cityInput{width:360px;max-width:100%;padding:10px 36px 10px 12px;border-radius:10px;border:2px solid var(--accent);background:#111;color:#00ffc3;font-weight:700;box-shadow:var(--shadow)}
+  .btn{background:#7a6cb6;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;box-shadow:0 0 10px rgba(122,108,182,.5)}
+  #suggestions{position:absolute;top:100%;left:0;right:0;background:#121212;border:1px solid var(--border);border-radius:10px;list-style:none;padding:0;margin:6px 0 0 0;display:none;overflow:hidden;z-index:30}
+  #suggestions li{padding:10px 12px;cursor:pointer;color:var(--text)} #suggestions li:hover{background:#243442}
 
-    
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
-  background-size: 400% 400%;
-  animation: gradientShift 60s ease infinite;
-  color: var(--text-color);
-  padding: 20px;
-  margin: 0;
-  position: relative;
-  overflow-x: hidden;
-}
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-    
+  /* TOP ROW */
+  .top-row{display:grid;grid-template-columns: minmax(300px, 1fr) minmax(280px, 1fr);gap:16px;align-items:start}
+  .left-col{display:flex;flex-direction:column;gap:16px}
+  .right-col{position:relative}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+  .panel strong{color:var(--accent)}
+  .kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 10px}
 
-  #cityDisplay {
-    font-size: 1.2em;
-    color: #00ffc3;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #3e5363;
-    border-radius: 10px;
-    padding: 10px 20px;
-    display: inline-block;
-    margin: 10px auto;
-    text-shadow: 0 0 5px #00ffc3;
-  }
+  /* Map panel */
+  #mapPanel{padding:0;overflow:hidden}
+  #map{width:100%;height:100%}
+  .zoom-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:.85em;border:1px solid rgba(255,255,255,.2);z-index:2}
+  .map-tip{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 8px;border-radius:8px;font-size:.9em;border:1px solid rgba(255,255,255,.2);z-index:2}
 
-    .starry-bg {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .starry-bg::before {
-      content: '';
-      position: absolute;
-      top: -100%;
-      left: 0;
-      width: 100%;
-      height: 300%;
-      background: transparent;
-      box-shadow:
-        10px 20px white,
-        50px 80px #888,
-        90px 150px white,
-        200px 300px #aaa,
-        300px 50px #777,
-        400px 500px white,
-        600px 200px #999,
-        800px 100px white,
-        1000px 400px #666,
-        1200px 250px white;
-      animation: stars-fall 60s linear infinite;
-      opacity: 0.5;
-    }
-
-    @keyframes stars-fall {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100%); }
-    }
-
-    h1, h2 {
-      text-align: center;
-      color: #ffffff;
-    }
-
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    #cityInput {
-      padding: 10px 35px 10px 10px;
-      width: 300px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background-color: #121212;
-      color: var(--text-color);
-    }
-
-    .clear-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-      color: #ccc;
-      display: none;
-      line-height: 1;
-    }
-
-    .controls button {
-  transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(0, 255, 195, 0.3);
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-    }
-
-    .controls button:hover {
-      background: var(--secondary);
-    }
-
-    #suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background: #121212;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      width: 100%;
-      list-style: none;
-      padding: 0;
-      margin-top: 5px;
-      z-index: 1000;
-      display: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
-    }
-
-    #suggestions li {
-      padding: 10px;
-      cursor: pointer;
-    }
-
-    #suggestions li:hover {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .layout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: flex-start;
-    }
-
-    .map-container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 30%;
-  min-width: 200px;
-}
-
-    #map {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-}
-
-    .info-container {
-      flex: 1 1 55%;
-    }
-
-    .moon-phase {
-      background: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    }
-
-    .moon-phase img {
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    .forecast-day {
-      margin-bottom: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      background: var(--panel-bg);
-    }
-
-    .forecast-day h3 {
-      margin: 0;
-      padding: 10px;
-      cursor: pointer;
-      background: var(--primary);
-      color: white;
-      border-radius: 10px 10px 0 0;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .forecast-content {
-      display: none;
-      padding: 10px;
-      height: auto; overflow: visible; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 8px;
-      border: 1px solid #333;
-      text-align: center;
-    }
-
-    .spinner {
-      display: none;
-      margin: 0 auto;
-      border: 8px solid #333;
-      border-top: 8px solid var(--primary);
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
-    }
-  
-    .forecast-scroll {
-      display: flex;
-      overflow-x: auto;
-      gap: 10px;
-      padding: 10px 0;
-    }
-
-    .forecast-card {
-      min-width: 70px;
-      font-size: 0.8em;
-      background: #2c2f33;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 6px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .forecast-card span {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .layout {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 20px;
-      height: 90vh;
-      align-items: stretch;
-    }
-
-    .info-container {
-      width: 70%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .map-container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  width: 30%;
-  min-width: 200px;
-}
-
-    #map {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-}
-
-    .info-box {
-  font-size: 1.05em;
-  border: 1px solid #3e5363;
-  box-shadow: 0 0 4px rgba(255,255,255,0.05);
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.info-box strong {
-  font-size: 1.2em;
-  color: #00ffc3;
-  text-shadow: 0 0 3px #00ffc3;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.info-box div {
-  margin-bottom: 6px;
-}
-      
-      top: 0;
-      background: var(--panel-bg);
-      z-index: 10;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 10px;
-    }
-
-
-    .layout {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 20px;
-      align-items: flex-start;
-    }
-
-    .info-container {
-      flex: 1 1 60%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .map-container {
-      flex: 1 1 40%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .map-section-item {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .map-section-item iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    
-  h1 {
-    margin: 10px 0 5px 0;
-    font-size: 1.8em;
-  }
-  .controls {
-    margin-bottom: 10px;
-  }
-  body {
-    padding: 10px;
-  }
-
-  #cityInput {
-    padding: 6px 30px 6px 8px;
-    width: 240px;
-  }
-  .controls button {
-  transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(0, 255, 195, 0.3);
-    padding: 6px 10px;
-    font-size: 0.9em;
-  }
-
-  
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom, #0b0c1a, #1b2c3a);
-  background-size: 400% 400%;
-  animation: gradientShift 60s ease infinite;
-  color: var(--text-color);
-  padding: 20px;
-  margin: 0;
-  position: relative;
-  overflow-x: hidden;
-}
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-    
-  @keyframes bg-fade {
-    0% { background: radial-gradient(ellipse at bottom, #1b2c45 0%, #0d0f1a 100%); }
-    100% { background: radial-gradient(ellipse at bottom, #223b5f 0%, #151826 100%); }
-  }
-
-  .input-wrapper {
-    box-shadow: 0 0 10px rgba(0,255,195,0.4);
-    border-radius: 10px;
-    background: rgba(0, 255, 195, 0.05);
-    padding: 5px;
-  }
-  #cityInput {
-    font-size: 1em;
-    font-weight: bold;
-    border: 2px solid #00ffc3;
-    background-color: #111;
-    color: #00ffc3;
-    transition: box-shadow 0.3s ease;
-  }
-  #cityInput:focus {
-    outline: none;
-    box-shadow: 0 0 12px #00ffc3;
-  }
+  /* Forecast */
+  .forecast-day{border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative}
+  .forecast-day h3{margin:0;padding:10px;background:#4b3f72;color:#fff;display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;z-index:2}
+  .forecast-content{display:none;padding:10px;position:relative}
+  .forecast-scroll-wrapper{position:relative}
+  .forecast-scroll{position:relative;display:flex;gap:8px;overflow-x:auto;padding:6px 0;z-index:2}
+  /* IMPORTANT CHANGE: bg-graph sits INSIDE .forecast-scroll so it scrolls with hours */
+  .bg-graph{position:absolute;top:0;left:0;z-index:1;pointer-events:none;}
+  .forecast-card{min-width:80px;font-size:.9em;background:rgba(44,47,51,0.72);border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;position:relative;z-index:2}
+  .scroll-left,.scroll-right{background:none;border:none;color:#fff;font-size:1.5em;padding:6px 10px;cursor:pointer;position:absolute;top:50%;transform:translateY(-50%);opacity:.6;text-shadow:0 0 6px rgba(255,255,255,.3);z-index:3}
+  .scroll-left{left:6px}.scroll-right{right:6px}
+  .spinner{display:none;width:44px;height:44px;margin:8px auto;border:6px solid #333;border-top:6px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{100%{transform:rotate(360deg)}}
+  .footer{text-align:center;opacity:.8;margin-top:10px;font-size:.95em}
+  .small{font-size:.92em;opacity:.9}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#243442;border:1px solid var(--border);margin:4px 6px 0 0}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/astronomy.js"></script><style>
-
-
-
-.scroll-left, .scroll-right {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.05em;
-  padding: 4px 6px;
-  cursor: pointer;
-  z-index: 10;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.5;
-}
-.forecast-scroll-wrapper {
-  position: relative;
-}
-.forecast-scroll {
-  position: relative;
-}
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-.forecast-scroll-wrapper {
-  position: relative;
-}
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-</style><style>
-
-
-
-.scroll-left, .scroll-right {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.05em;
-  padding: 4px 6px;
-  cursor: pointer;
-  z-index: 10;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.5;
-}
-.forecast-scroll-wrapper {
-  position: relative;
-}
-.forecast-scroll {
-  position: relative;
-}
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-.forecast-scroll-wrapper {
-  position: relative;
-}
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-    
-.scroll-left { left: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-.scroll-right { right: 6px; background: none; border: none; color: white; font-size: 1.6em; padding: 6px 10px; cursor: pointer; z-index: 10; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.6; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
-</style></head>
+</head>
 <body>
-
-<div class="top-bar">
-  <div class="version-tag">Verze 0.1</div>
+<div class="topbar">
   <div class="menu-container">
     <button class="menu-toggle" onclick="toggleMenu()">📋 Menu</button>
     <div class="menu-dropdown" id="mainMenu">
-      <div class="menu-item" onclick="toggleSubMenu()">🗺️ Mapy ▸</div>
-      <div class="submenu" id="mapySubmenu">
-        <a href="https://www.lightpollutionmap.info" target="_blank">💡 Light Pollution Map</a>
-        <a href="https://www.windy.com" target="_blank">🌬️ Windy</a>
+      <div class="menu-section">
+        <div class="menu-item has-submenu">🗺️ Mapy ▸
+          <div class="submenu">
+            <a class="menu-link" href="https://www.lightpollutionmap.info" target="_blank">💡 Light Pollution Map</a>
+            <a class="menu-link" href="https://www.windy.com" target="_blank">🌬️ Windy</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <div class="version-tag">v0.2.2‑p7</div>
 </div>
 
+<h1>🪐 Astronomická předpověď</h1>
 
+<div class="controls">
+  <div class="input-wrapper">
+    <input id="cityInput" type="text" placeholder="Zadejte město..." oninput="autocompleteCities()"/>
+    <ul id="suggestions"></ul>
+  </div>
+  <button class="btn" onclick="getLocation()">📍 Moje poloha</button>
+</div>
 
+<div class="top-row">
+  <div class="left-col" id="leftTop">
+    <div class="panel">
+      <strong>📍 Informace o místě</strong>
+      <div class="kv" style="margin-top:8px;">
+        <span><strong>Název:</strong></span><span id="info-name">—</span>
+        <span><strong>GPS:</strong></span><span id="info-gps">—</span>
+        <span><strong>Mapa LP:</strong></span><span><a id="bortle-link" href="#" target="_blank" style="display:none;color:#00ffc3;text-decoration:underline;font-weight:bold;">Zobrazit Bortle</a></span>
+      </div>
+    </div>
 
+    <div class="panel">
+      <strong>🔭 Astronomické informace</strong>
+      <div style="margin-top:8px;">
+        <div><strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
+        <div id="phase-raw" class="small" style="display:none;margin-top:4px;"></div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <strong>🪐 Viditelné planety ~22:00</strong>
+          <span id="planet-log" class="small" style="opacity:.85;"></span>
+        </div>
+        <div id="planets-list"></div>
+      </div>
+    </div>
+  </div>
 
-
-
-
+  <div class="right-col">
+    <div class="panel" id="mapPanel">
+      <div id="map"></div>
+      <div id="mapZoomBadge" class="zoom-badge">Zoom: vypnuto</div>
+      <div class="map-tip">Klikni <b>pravým</b> na mapu pro zapnutí/vypnutí zoomu</div>
     </div>
   </div>
 </div>
 
+<div class="spinner" id="spinner" style="margin-top:16px;"></div>
+<div id="forecast" style="margin-top:8px;"></div>
 
-
-
-
-</div>
-  </div>
-</div>
-
-
-
+<div class="footer">
+  Zdroj fází: ipgeolocation.io • Počasí a geokódování: Open-Meteo • Planety: Astronomy Engine (fallback ipgeolocation) • Mapa: Leaflet & OSM
 </div>
 
-<div class="starry-bg"></div>
-<h1 style="font-size:2.2em; text-shadow: 0 0 15px #00ffc3;">🪐 Astronomická předpověď</h1>
-<div class="controls">
-<div class="input-wrapper">
-<input id="cityInput" oninput="autocompleteCities(); document.querySelector('.clear-btn').style.display = this.value ? 'block' : 'none';" placeholder="Zadejte město..." type="text"/>
-<button class="clear-btn" onclick="document.getElementById('cityInput').value=''; this.style.display='none'; document.getElementById('suggestions').style.display='none';">×</button>
-<ul id="suggestions"></ul>
-</div>
-<h2 id="cityDisplay" style="display:none; text-align:center; font-size: 1.5em; color:#00ffc3; text-shadow: 0 0 5px #00ffc3;"></h2>
-<button onclick="getLocation()">📍 Moje poloha</button>
-</div>
-<div class="layout">
-<!-- Levý sloupec: Info + předpověď -->
-<div class="info-container"><div style="display: flex; gap: 20px; background: var(--panel-bg); align-items: stretch;"><div class="moon-phase" style="font-size: 1.05em; border: 1px solid #00ffc3; box-shadow: 0 0 8px rgba(0,255,195,0.2); padding: 16px; background: rgba(0, 255, 195, 0.03); flex: 1;">
-<strong>📍 Informace o místě</strong>
-<div><strong>🌆 Název:</strong> <span id="info-name">-</span></div>
-<div><strong>🌐 GPS:</strong> <span id="info-gps">-</span></div>
-<div style="margin-top: 8px;">
-</div>
-</div><div class="moon-phase" style="font-size: 1.05em; border: 1px solid #00ffc3; box-shadow: 0 0 8px rgba(0,255,195,0.2); padding: 16px; background: rgba(0, 255, 195, 0.03); flex: 1;">
-<strong>🔭 Astronomické informace</strong>
-<div id="moon-phase-display" style="margin-top: 8px; font-size: 1.05em;">
-<strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span>
-</div><a href="#" id="bortle-link" style="display: none; color:#00ffc3; font-weight:bold; text-decoration:underline;" target="_blank">
-    🌌 Zobrazit Bortleovu třídu
-  </a></div></div><div style="display: flex; gap: 20px;"></div>
-<div class="spinner" id="spinner"></div>
-
-<div id="forecast"></div>
-</div>
-<!-- Pravý sloupec: Mapa -->
-</div>
 <script>
-  let selectedCity = null;
-  let map = null;
-  let marker = null;
+const IPGEO_API_KEY="781aa2d69af74745906e01cc68c84207";
+const DEBUG=new URLSearchParams(location.search).has("debug");
 
-  function toggleForecast(dayId) {
-    const content = document.getElementById(dayId);
-    const icon = document.getElementById(dayId + '-icon');
-    if (content.style.display === 'none') {
-      content.style.display = 'block';
-      icon.textContent = '⬆️';
-    } else {
-      content.style.display = 'none';
-      icon.textContent = '⬇️';
-    }
-  }
+/* Menu */
+function toggleMenu(){const m=document.getElementById("mainMenu");m.style.display=m.style.display==="block"?"none":"block"}
+document.addEventListener("click",(e)=>{const m=document.getElementById("mainMenu");const t=document.querySelector(".menu-toggle");if(m&&t&&!m.contains(e.target)&&!t.contains(e.target))m.style.display="none"});
 
-  function showSpinner(show) {
-    document.getElementById('spinner').style.display = show ? 'block' : 'none';
-  }
+/* Helpers */
+const $=(id)=>document.getElementById(id);
+function showSpinner(b){$("spinner").style.display=b?"block":"none"}
+function getDayName(d){const today=new Date().toISOString().split('T')[0];if(d===today)return"Dnes";const arr=['Neděle','Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota'];return arr[new Date(d).getDay()]}
+function getWeatherIcon(c,r){if(r>2)return'🌧️';if(r>0)return'🌦️';if(c>75)return'☁️';if(c>25)return'🌤️';return'☀️'}
 
-  function getWeatherIcon(cloud, rain) {
-    if (rain > 2) return '🌧️';
-    if (rain > 0) return '🌦️';
-    if (cloud > 75) return '☁️';
-    if (cloud > 25) return '🌤️';
-    return '☀️';
-  }
+/* Layout sync */
+function syncMapHeight(){
+  const left=document.getElementById("leftTop");
+  const mapPanel=document.getElementById("mapPanel");
+  const mapDiv=document.getElementById("map");
+  if(!left||!mapPanel||!mapDiv) return;
+  const h=left.getBoundingClientRect().height;
+  mapPanel.style.height=h+"px";
+  mapDiv.style.height=h+"px";
+  if(window._leafletMap){ setTimeout(()=> window._leafletMap.invalidateSize(), 100); }
+}
+const leftObserver = new MutationObserver(()=> syncMapHeight());
+leftObserver.observe(document.getElementById("leftTop"), {subtree:true, childList:true, characterData:true});
+window.addEventListener("resize", syncMapHeight);
 
-  
-function getDayName(dateStr) {
-  const today = new Date().toISOString().split('T')[0];
-  if (dateStr === today) return "Dnes";
+/* Geocoding & selection */
+let selectedCity=null;
+async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);fetchPlanets(c.latitude,c.longitude);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
 
-    const days = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
-    const date = new Date(dateStr);
-    return days[date.getDay()];
-  }
+async function getLocation(){if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");navigator.geolocation.getCurrentPosition(async p=>{const lat=p.coords.latitude,lon=p.coords.longitude;const name=await reverseGeocode(lat,lon);const c={name,country:"",latitude:lat,longitude:lon};selectedCity=c;updateLocationInfo(c);initMap(lat,lon);fetchForecast(lat,lon);fetchMoonPhase(lat,lon);fetchPlanets(lat,lon)},e=>alert("Nepodařilo se zjistit polohu."))}
 
-  async function autocompleteCities() {
-    const input = document.getElementById('cityInput').value.trim();
-    const suggestions = document.getElementById('suggestions');
-    if (input.length < 2) return suggestions.style.display = 'none';
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=5&language=cs&format=json`);
-    const data = await res.json();
-    suggestions.innerHTML = '';
-    (data.results || []).forEach(city => {
-      const li = document.createElement('li');
-      li.textContent = `${city.name}, ${city.country}`;
-      li.onclick = () => {
-  selectedCity = city;
-  document.getElementById('cityInput').value = `${city.name}, ${city.country}`;
-  document.getElementById('cityDisplay').textContent = `${city.name}, ${city.country}`;
-  updateLocationInfo(city);
-        suggestions.style.display = 'none';
-        initMap(city.latitude, city.longitude);
-        fetchForecast(city.latitude, city.longitude);
-        fetchMoonPhase(city.latitude, city.longitude);
-        fetchPlanets(city.latitude, city.longitude);
-        updateLocationInfo(city);
-      };
-      suggestions.appendChild(li);
+async function reverseGeocode(lat,lon){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);const d=await r.json();return d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||d.display_name||`${lat.toFixed(4)}, ${lon.toFixed(4)}`}catch{return `${lat.toFixed(4)}, ${lon.toFixed(4)}`}} 
+
+function updateLocationInfo(c){const name=c.name||"-";const country=c.country||"";const lat=typeof c.latitude==="number"?c.latitude:null;const lon=typeof c.longitude==="number"?c.longitude:null;$("info-name").innerHTML=country?`<span style="color:#00ffc3;font-weight:bold;">${name}</span>, ${country}`:`<span style="color:#00ffc3;font-weight:bold;">${name}</span>`;$("info-gps").textContent=(lat!=null&&lon!=null)?`${lat.toFixed(4)}, ${lon.toFixed(4)}`:"—";const link=$("bortle-link");if(lat!=null&&lon!=null){link.href=`https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;link.style.display="inline"}else{link.style.display="none"}}
+
+/* Map on the right */
+let map=null,marker=null,zoomEnabled=false,zoomControl=null;
+function initMap(lat,lon){
+  syncMapHeight();
+  if(!map){
+    map=window._leafletMap = L.map('map', { zoomControl:false, scrollWheelZoom:false, touchZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, dragging:true }).setView([lat,lon],10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    marker=L.marker([lat,lon]).addTo(map);
+    map.on('contextmenu', function(){
+      zoomEnabled = !zoomEnabled;
+      const badge = $("mapZoomBadge");
+      if(zoomEnabled){
+        map.scrollWheelZoom.enable(); map.touchZoom.enable(); map.doubleClickZoom.enable(); map.boxZoom.enable(); map.keyboard.enable();
+        if(!zoomControl){ zoomControl = L.control.zoom({position:'topleft'}).addTo(map); }
+        if(badge) badge.textContent = "Zoom: zapnuto";
+      } else {
+        map.scrollWheelZoom.disable(); map.touchZoom.disable(); map.doubleClickZoom.disable(); map.boxZoom.disable(); map.keyboard.disable();
+        if(zoomControl){ map.removeControl(zoomControl); zoomControl=null; }
+        if(badge) badge.textContent = "Zoom: vypnuto";
+      }
     });
-    suggestions.style.display = 'block';
+  } else {
+    map.setView([lat,lon], 10);
+    marker.setLatLng([lat,lon]);
   }
-
-  async function manualSearch() {
-    const input = document.getElementById('cityInput').value.trim();
-    if (!input) return alert("Zadejte město");
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(input)}&count=1&language=cs&format=json`);
-    const data = await res.json();
-    if (!data.results || !data.results.length) return alert("Město nenalezeno.");
-    selectedCity = data.results[0];
-    document.getElementById('cityDisplay').textContent = `${selectedCity.name}, ${selectedCity.country}`;
-    console.log('Manuálně zadané město:', selectedCity);
-    initMap(selectedCity.latitude, selectedCity.longitude);
-    fetchForecast(selectedCity.latitude, selectedCity.longitude);
-    fetchMoonPhase(selectedCity.latitude, selectedCity.longitude);
-    updateLocationInfo(selectedCity);
-  }
-
-  async function getLocation() {
-  document.getElementById("cityInput").value = "";
-  navigator.geolocation.getCurrentPosition(async pos => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      const name = await reverseGeocode(lat, lon);
-      console.log('Lokace nalezena:', name);
-      initMap(lat, lon);
-      updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
-      fetchForecast(lat, lon);
-      fetchMoonPhase(lat, lon);
-      fetchPlanets(lat, lon);
-      updateLocationInfo({ name, country: '', latitude: lat, longitude: lon });
-    }, err => alert("Nepodařilo se zjistit polohu."));
-  }
-
-  async function reverseGeocode(lat, lon) {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
-      const data = await res.json();
-      const name = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || data.display_name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-      document.getElementById('cityDisplay').textContent = name;
-      return name;
-    } catch {
-      const fallback = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-      document.getElementById('cityDisplay').textContent = fallback;
-      return fallback;
-    }
-  }
-
-  function initMap(lat, lon) {
-    if (!map) {
-      map = L.map('map', { scrollWheelZoom: false }).setView([lat, lon], 10);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(map);
-      marker = L.marker([lat, lon]).addTo(map);
-    } else {
-      map.setView([lat, lon], 10);
-      marker.setLatLng([lat, lon]);
-    }
-  }
-
-  
-async function fetchForecast(lat, lon) {
-  showSpinner(true);
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
-  const data = await res.json();
-  showSpinner(false);
-  const { time, temperature_2m, cloudcover, precipitation, windspeed_10m } = data.hourly;
-  const forecastDiv = document.getElementById('forecast');
-  forecastDiv.innerHTML = '';
-
-  const days = {};
-
-  for (let i = 0; i < time.length; i++) {
-    const [date, hour] = time[i].split('T');
-    const hourNum = parseInt(hour.split(':')[0]);
-
-    // Hlavní den
-    if (!days[date]) days[date] = [];
-    days[date].push({
-      time: hour,
-      temp: temperature_2m[i],
-      cloud: cloudcover[i],
-      rain: precipitation[i],
-      wind: windspeed_10m[i]
-    });
-
-    // Přidání časů do předchozího dne (pro rozšíření na 36 hodin)
-    if (hourNum < 12) {
-      const prevDate = new Date(date);
-      prevDate.setDate(prevDate.getDate() - 1);
-      const prevDateStr = prevDate.toISOString().split('T')[0];
-      if (!days[prevDateStr]) days[prevDateStr] = [];
-      days[prevDateStr].push({
-        time: hour,
-        temp: temperature_2m[i],
-        cloud: cloudcover[i],
-        rain: precipitation[i],
-        wind: windspeed_10m[i]
-      });
-    }
-  }
-
-  
-
-Object.entries(days).forEach(([date, entries], idx) => {
-  // Zobraz den pouze pokud má alespoň jednu hodinu od 12:00 dál
-  if (!entries.some(e => {
-    const h = parseInt(e.time.split(':')[0]);
-    return h >= 12;
-  })) return;
-
-
-    const section = document.createElement('div');
-    section.className = 'forecast-day';
-
-    const header = document.createElement('h3');
-    const contentId = `day-${idx}`;
-    const dayName = getDayName(date);
-    header.innerHTML = `
-      <span id="${contentId}-icon">⬆️</span> ${dayName}, ${date}
-      <button onclick="event.stopPropagation(); centerTime('${contentId}', '12:00')">Poledne</button>
-      <button onclick="event.stopPropagation(); centerTime('${contentId}', '23:00')">Půlnoc</button>
-      `;
-    header.onclick = () => toggleForecast(contentId);
-    section.appendChild(header);
-
-    const content = document.createElement('div');
-    content.className = 'forecast-content';
-    content.id = contentId;
-    content.style.display = 'block';
-
-    
-const wrapper = document.createElement('div');
-wrapper.className = 'forecast-scroll-wrapper';
-wrapper.style.position = 'relative';
-
-const leftBtn = document.createElement('button');
-leftBtn.className = 'scroll-left';
-leftBtn.innerHTML = '◀';
-leftBtn.onclick = () => scrollContainer.scrollBy({ left: -250, behavior: 'smooth' });
-
-const rightBtn = document.createElement('button');
-rightBtn.className = 'scroll-right';
-rightBtn.innerHTML = '▶';
-rightBtn.onclick = () => scrollContainer.scrollBy({ left: 250, behavior: 'smooth' });
-
-const scrollContainer = document.createElement('div');
-scrollContainer.className = 'forecast-scroll';
-
-wrapper.appendChild(leftBtn);
-wrapper.appendChild(scrollContainer);
-wrapper.appendChild(rightBtn);
-
-
-    entries
-      .filter(e => {
-        if (date === new Date().toISOString().split('T')[0]) {
-          const currentHour = new Date().getHours();
-          return parseInt(e.time.split(':')[0]) >= currentHour;
-        }
-        return true;
-      })
-      .forEach(e => {
-        const card = document.createElement('div');
-        card.className = 'forecast-card';
-        const icon = getWeatherIcon(e.cloud, e.rain);
-        
-let qualityColor;
-if (e.cloud <= 25) {
-  qualityColor = 'green';
-} else if (e.cloud <= 75) {
-  qualityColor = 'orange';
-} else {
-  qualityColor = 'red';
+  setTimeout(()=> { map.invalidateSize(); syncMapHeight(); }, 150);
 }
 
-card.innerHTML = `
-          <span><strong>${e.time}</strong></span>
-          <span>${icon}</span>
-          <span>${e.temp}°C</span>
-          <span>☁️ ${e.cloud}%</span>
-          <span>🌧️ ${e.rain} mm</span>
-          <span>💨 ${e.wind} km/h</span>
-          <div style="width: 100%; height: 8px; background-color: ${qualityColor}; border-radius: 4px; margin-top: 4px;"></div>
-    `;
-        scrollContainer.appendChild(card);
+/* Moon phase (API, cz) */
+function getMoonEmojiFromName(n){n=String(n||"").toLowerCase().replace(/_/g," ").trim();if(n.includes("new moon"))return"🌑 Nov";if(n.includes("waxing crescent"))return"🌒 Dorůstající srpek";if(n.includes("first quarter"))return"🌓 První čtvrť";if(n.includes("waxing gibbous"))return"🌔 Dorůstající měsíc";if(n.includes("full moon"))return"🌕 Úplněk";if(n.includes("waning gibbous"))return"🌖 Couvající měsíc";if(n.includes("last quarter"))return"🌗 Poslední čtvrť";if(n.includes("waning crescent"))return"🌘 Couvající srpek";return"🌙 Neznámá fáze"}
+async function fetchMoonPhase(lat,lon){const url=`https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=${lat}&long=${lon}`;try{const r=await fetch(url);const d=await r.json();const p=d.moon_phase||"Neznámá fáze";$("moon-phase-label").textContent=getMoonEmojiFromName(p);if(DEBUG){$("phase-raw").style.display="block";$("phase-raw").textContent=`API: ${p}`}}catch(e){console.error("Chyba při načítání fáze:",e);$("moon-phase-label").textContent="Chyba načítání";$("phase-raw").textContent=""}}
+
+/* === Star visibility graph support === */
+let moonPhaseFracByDate = {};
+function illuminationFromPhase(frac){ return 0.5 - 0.5*Math.cos(2*Math.PI*frac); } // 0..1
+async function fetchMoonPhasesForecast(lat,lon){
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=moon_phase&timezone=Europe%2FPrague`;
+    const res=await fetch(url);
+    const data=await res.json();
+    moonPhaseFracByDate = {};
+    if(data?.daily?.time){
+      for(let i=0;i<data.daily.time.length;i++){
+        moonPhaseFracByDate[data.daily.time[i]] = data.daily.moon_phase[i];
+      }
+    }
+  }catch(e){ console.warn("Moon phases forecast failed",e); moonPhaseFracByDate={}; }
+}
+function visibilityScore(cloud, precip, dateStr){
+  const cloudScore = 100 - Math.min(Math.max(cloud,0),100);
+  const rainPenalty = Math.min(precip*50, 50);
+  const phase = moonPhaseFracByDate[dateStr] ?? 0;
+  const illum = illuminationFromPhase(phase);
+  const moonPenalty = illum * 40;
+  const raw = cloudScore - rainPenalty - moonPenalty;
+  return Math.max(0, Math.min(100, Math.round(raw)));
+}
+function drawBackgroundGraph(scrollEl, entries, dateStr){
+  // Remove old background *inside* the scroll element
+  const old = scrollEl.querySelector('.bg-graph');
+  if(old) old.remove();
+
+  // Use the scroll content size so it scrolls together
+  const totalW = scrollEl.scrollWidth;
+  const totalH = scrollEl.clientHeight || 140;
+  const midY = totalH/2;
+  const amp = (totalH/2) * 0.9;
+  const svgNS="http://www.w3.org/2000/svg";
+
+  const wrap = document.createElement('div');
+  wrap.className = "bg-graph";
+  wrap.style.width = totalW + "px";
+  wrap.style.height = totalH + "px";
+
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+  svg.style.display='block';
+
+  // Baseline
+  const baseline = document.createElementNS(svgNS, 'line');
+  baseline.setAttribute('x1', 0); baseline.setAttribute('y1', midY);
+  baseline.setAttribute('x2', totalW); baseline.setAttribute('y2', midY);
+  baseline.setAttribute('stroke', 'rgba(255,255,255,0.2)');
+  baseline.setAttribute('stroke-width', '1');
+  svg.appendChild(baseline);
+
+  const n = entries.length;
+  if(n<2){ wrap.appendChild(svg); scrollEl.insertBefore(wrap, scrollEl.firstChild); return; }
+
+  const points = [];
+  for(let i=0;i<n;i++){
+    const x = (totalW-1) * (i/(n-1));
+    const score = visibilityScore(entries[i].cloud, entries[i].rain, dateStr); // 0..100
+    const norm = score - 50; // -50..+50
+    const y = midY - (norm/50)*amp;
+    points.push([x,y]);
+  }
+
+  // Two-tone areas
+  const makeAreaPath = (clampFn, fill) => {
+    const dTop = points.map(([x,y],i)=> (i===0 ? `M ${x} ${clampFn(y)}` : `L ${x} ${clampFn(y)}`)).join(' ');
+    const d = `${dTop} L ${points[n-1][0]} ${midY} L ${points[0][0]} ${midY} Z`;
+    const p = document.createElementNS(svgNS, 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('fill', fill);
+    p.setAttribute('stroke', 'transparent');
+    return p;
+  };
+  const greenArea = makeAreaPath(y => Math.min(y, midY), 'var(--greenFill)');
+  const redArea   = makeAreaPath(y => Math.max(y, midY), 'var(--redFill)');
+  svg.appendChild(greenArea);
+  svg.appendChild(redArea);
+
+  // Outline
+  const linePath = document.createElementNS(svgNS, 'path');
+  const dLine = points.map(([x,y],i)=> (i===0 ? `M ${x} ${y}` : `L ${x} ${y}`)).join(' ');
+  linePath.setAttribute('d', dLine);
+  linePath.setAttribute('fill', 'none');
+  linePath.setAttribute('stroke', 'rgba(255,255,255,0.6)');
+  linePath.setAttribute('stroke-width', '1.5');
+  svg.appendChild(linePath);
+
+  wrap.appendChild(svg);
+  // Insert as the first child so it sits behind cards and scrolls with them
+  scrollEl.insertBefore(wrap, scrollEl.firstChild);
+}
+
+/* Forecast */
+async function fetchForecast(lat,lon){
+  showSpinner(true);
+  await fetchMoonPhasesForecast(lat,lon);
+  const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+  const d=await r.json();
+  showSpinner(false);
+  const {time,temperature_2m,cloudcover,precipitation,windspeed_10m}=d.hourly;
+  const div=$("forecast");div.innerHTML="";
+  const days={};
+  for(let i=0;i<time.length;i++){
+    const [date,hour]=time[i].split('T');
+    const h=parseInt(hour.split(':')[0]);
+    if(!days[date]) days[date]=[];
+    const entry={time:hour,temp:temperature_2m[i],cloud:cloudcover[i],rain:precipitation[i],wind:windspeed_10m[i],date};
+    days[date].push(entry);
+    if(h<12){
+      const prev=new Date(date); prev.setDate(prev.getDate()-1); const prevStr=prev.toISOString().split('T')[0];
+      if(!days[prevStr]) days[prevStr]=[];
+      days[prevStr].push(entry);
+    }
+  }
+  Object.entries(days).forEach(([date,entries],idx)=>{
+    if(!entries.some(e=>parseInt(e.time.split(':')[0])>=12)) return;
+    const section=document.createElement('div'); section.className='forecast-day';
+    const header=document.createElement('h3'); const contentId=`day-${idx}`;
+    header.dataset.date=date;
+    header.innerHTML=`<span id="${contentId}-icon">⬆️</span> ${getDayName(date)}, ${date}
+      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '12:00')">Poledne</button>
+      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '23:00')">Půlnoc</button>`;
+    header.onclick=()=>toggleForecast(contentId);
+    section.appendChild(header);
+
+    const content=document.createElement('div'); content.className='forecast-content'; content.id=contentId; content.style.display='block';
+    const wrapper=document.createElement('div'); wrapper.className='forecast-scroll-wrapper';
+    const leftBtn=document.createElement('button'); leftBtn.className='scroll-left'; leftBtn.textContent='◀';
+    const rightBtn=document.createElement('button'); rightBtn.className='scroll-right'; rightBtn.textContent='▶';
+    const scroll=document.createElement('div'); scroll.className='forecast-scroll';
+    leftBtn.onclick=()=>scroll.scrollBy({left:-250,behavior:'smooth'});
+    rightBtn.onclick=()=>scroll.scrollBy({left:250,behavior:'smooth'});
+    wrapper.appendChild(leftBtn); wrapper.appendChild(scroll); wrapper.appendChild(rightBtn);
+
+    const nowIso=new Date().toISOString().split('T')[0];
+    entries
+      .filter(e => (date !== nowIso) || (parseInt(e.time.split(':')[0]) >= new Date().getHours()))
+      .forEach(e => {
+        const card=document.createElement('div'); card.className='forecast-card';
+        const icon=getWeatherIcon(e.cloud, e.rain);
+        let color=e.cloud<=25?'green':(e.cloud<=75?'orange':'red');
+        card.innerHTML=`<div><strong>${e.time}</strong></div>
+                        <div style="font-size:1.4em">${icon}</div>
+                        <div>${e.temp}°C</div>
+                        <div>☁️ ${e.cloud}%</div>
+                        <div>🌧️ ${e.rain} mm</div>
+                        <div>💨 ${e.wind} km/h</div>
+                        <div style="width: 100%; height: 8px; background-color: ${color}; border-radius: 4px; margin-top: 4px;"></div>`;
+        scroll.appendChild(card);
       });
 
     content.appendChild(wrapper);
     section.appendChild(content);
-    forecastDiv.appendChild(section);
+    div.appendChild(section);
+
+    // Draw *inside* the scroll element so it scrolls with cards
+    requestAnimationFrame(()=> drawBackgroundGraph(scroll, entries, date));
   });
 }
 
+/* Toggle helpers */
+function toggleForecast(id){const c=document.getElementById(id);const i=document.getElementById(id+'-icon');if(c.style.display==='none'){c.style.display='block';i.textContent='⬆️'}else{c.style.display='none';i.textContent='⬇️'}}
+function centerTime(contentId,target){const sc=document.querySelector(`#${contentId} .forecast-scroll`);if(!sc)return;const cards=sc.querySelectorAll('.forecast-card');for(let i=0;i<cards.length;i++){const strong=cards[i].querySelector('strong');if(strong&&strong.textContent.trim()===target){const w=sc.clientWidth;const off=cards[i].offsetLeft;const cw=cards[i].offsetWidth;sc.scrollTo({left:off-(w/2)+(cw/2),behavior:'smooth'});break}}}
 
-  
-  
-function fetchPlanets(lat, lon) {
-  const log = (msg) => document.getElementById("planet-log").textContent = msg;
-
-  try {
-    log(`📍 Poloha: ${lat.toFixed(2)}, ${lon.toFixed(2)}`);
-    const tbody = document.getElementById("planet-table");
-    tbody.innerHTML = "";
-
-    const observer = new Astronomy.Observer(lat, lon, 0);
-    const date = new Date();
-    date.setHours(22, 0, 0, 0);
-
-    const planets = ["Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
-    let anyVisible = false;
-
-    for (const body of planets) {
-      const hor = Astronomy.Horizon(date, observer, body, "normal");
-      if (hor.altitude > 5) {
-        tbody.innerHTML += `<tr><td>${body}</td><td>${hor.altitude.toFixed(1)}</td><td>${hor.azimuth.toFixed(1)}</td></tr>`;
-        anyVisible = true;
+/* Planety @22:00 – AE (fallback API) */
+async function fetchPlanets(lat,lon){
+  const box=$("planets-list"); const log=(m)=>$("planet-log").textContent=m;
+  box.innerHTML=""; log("počítám…");
+  const render = (list) => {
+    box.innerHTML="";
+    let any=false;
+    for(const p of list){
+      if(Number.isFinite(p.alt)&&p.alt>5){
+        const el=document.createElement("span"); el.className="pill"; el.title=`Azimut ${p.az.toFixed(0)}° v 22:00`; el.textContent=`${p.label}: ${p.alt.toFixed(0)}°`; box.appendChild(el); any=true;
       }
     }
-
-    if (!anyVisible) {
-      tbody.innerHTML = "<tr><td colspan='3'>Žádné planety nejsou dobře viditelné.</td></tr>";
+    if(!any) box.innerHTML = `<span class="small">Žádné planety nejsou dobře viditelné v 22:00.</span>`;
+    log("");
+    syncMapHeight();
+  };
+  try{
+    if(!window.Astronomy) throw new Error("Astronomy Engine nenačten");
+    const Body=window.Astronomy.Body;
+    const mapEnum = {Mercury:Body.Mercury, Venus:Body.Venus, Mars:Body.Mars, Jupiter:Body.Jupiter, Saturn:Body.Saturn, Uranus:Body.Uranus, Neptune:Body.Neptune};
+    const now=new Date(); const t=new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0);
+    const obs=new window.Astronomy.Observer(lat, lon, 0);
+    const names=[["Mercury","Merkur"],["Venus","Venuše"],["Mars","Mars"],["Jupiter","Jupiter"],["Saturn","Saturn"],["Uranus","Uran"],["Neptune","Neptun"]];
+    const out=[];
+    for(const [eng, label] of names){
+      const hor=window.Astronomy.Horizontal(t, obs, mapEnum[eng], 'normal');
+      out.push({label, alt: hor.altitude, az: hor.azimuth});
     }
-
-    log("✅ Hotovo.");
-  } catch (e) {
-    log("❌ Chyba: " + e.message);
+    render(out);
+  }catch(e){
+    console.warn("AE selhalo -> fallback API", e);
+    try{
+      const url=`https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=${lat}&long=${lon}`;
+      const r=await fetch(url); const d=await r.json();
+      const out=[
+        {label:"Merkur", alt:+d.mercury_altitude, az:+d.mercury_azimuth},
+        {label:"Venuše", alt:+d.venus_altitude,   az:+d.venus_azimuth},
+        {label:"Mars",   alt:+d.mars_altitude,    az:+d.mars_azimuth},
+        {label:"Jupiter",alt:+d.jupiter_altitude, az:+d.jupiter_azimuth},
+        {label:"Saturn", alt:+d.saturn_altitude,  az:+d.saturn_azimuth},
+        {label:"Uran",   alt:+d.uranus_altitude,  az:+d.uranus_azimuth},
+        {label:"Neptun", alt:+d.neptune_altitude, az:+d.neptune_azimuth}
+      ];
+      render(out);
+    }catch(err){
+      box.innerHTML=`<span class="small">Chyba načítání planet.</span>`; log("");
+    }
   }
 }
 
-
-function updateLocationInfo(city) {
-    const name = city.name || '-';
-    const country = city.country || '';
-    const lat = typeof city.latitude === 'number' ? city.latitude.toFixed(4) : '-';
-    const lon = typeof city.longitude === 'number' ? city.longitude.toFixed(4) : '-';
-    document.getElementById('info-name').innerHTML = country
-  ? `<span style="color:#00ffc3; font-weight:bold;">${name}</span>, ${country}`
-  : `<span style="color:#00ffc3; font-weight:bold;">${name}</span>`;
-    document.getElementById('info-gps').textContent = `${lat}, ${lon}`;
-  }
-  
+/* Kick initial layout */
+window.addEventListener('load', syncMapHeight);
 </script>
-<script>
-  function resizeMapToSquare() {
-    const mapDiv = document.getElementById('map');
-    if (mapDiv) {
-      const width = mapDiv.offsetWidth;
-      mapDiv.style.height = `${width}px`;
-      if (window.map) map.invalidateSize();
-    }
-  }
-
-  window.addEventListener('load', resizeMapToSquare);
-  window.addEventListener('resize', resizeMapToSquare);
-</script>
-<script>
-  function updateWindyWidget(lat, lon) {
-    const windy = document.getElementById('windyFrame');
-    if (windy) {
-      windy.src = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&zoom=11&level=surface&overlay=satellite&menu=&message=&marker=&calendar=now&type=satellite&location=coordinates&detail=&metricWind=default&metricTemp=default`;
-    }
-  }
-
-  function resizeWindyToMatchMap() {
-    const mapDiv = document.getElementById('map');
-    const windyDiv = document.getElementById('windyFrame');
-    if (mapDiv && windyDiv) {
-      const height = mapDiv.offsetHeight;
-      windyDiv.style.height = height + 'px';
-    }
-  }
-
-  window.addEventListener('load', resizeWindyToMatchMap);
-  window.addEventListener('resize', resizeWindyToMatchMap);
-
-  const originalInitMap = window.initMap;
-  window.initMap = function(lat, lon) {
-      updateWindyWidget(lat, lon);
-      setTimeout(resizeWindyToMatchMap, 300);
-      const windyWrap = document.getElementById('windyBlockContainer');
-      if (windyWrap) { windyWrap.style.display = 'block'; windyWrap.style.height = '400px'; console.log('Windy shown'); }
-    };
-</script>
-<script>
-function syncMapAndWidgetHeight() {
-  const mapDiv = document.getElementById('map');
-  const windyDiv = document.getElementById('windyFrame');
-  if (mapDiv && windyDiv) {
-    const height = mapDiv.offsetWidth;
-    mapDiv.style.height = height + 'px';
-    windyDiv.style.height = height + 'px';
-  }
-}
-window.addEventListener('load', syncMapAndWidgetHeight);
-window.addEventListener('resize', syncMapAndWidgetHeight);
-</script>
-<script>
-  function updateBortleLink(lat, lon) {
-    const link = document.getElementById('bortle-link');
-    if (link && lat && lon) {
-      link.href = `https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;
-           link.style.display = 'inline';
-    }
-  }
-
-  // Extend updateLocationInfo to update the link
-  const originalUpdateLocationInfo = window.updateLocationInfo;
-  window.updateLocationInfo = function(city) {
-    originalUpdateLocationInfo(city);
-    if (city.latitude && city.longitude) {
-      updateBortleLink(city.latitude.toFixed(4), city.longitude.toFixed(4));
-    }
-  }
-</script>
-<script src="moon_phase.js"></script><script>
-function waitForAstronomy(callback) {
-  if (typeof Astronomy !== "undefined") {
-    callback();
-  } else {
-    setTimeout(() => waitForAstronomy(callback), 100);
-  }
-}
-
-// Rebind planetary and moon calls to wait for library
-const originalFetchPlanets = window.fetchPlanets;
-window.fetchPlanets = function(lat, lon) {
-  waitForAstronomy(() => originalFetchPlanets(lat, lon));
-};
-
-const originalFetchMoonPhase = window.fetchMoonPhase;
-window.fetchMoonPhase = function(lat, lon) {
-  waitForAstronomy(() => originalFetchMoonPhase(lat, lon));
-};
-</script>
-<script>
-async function fetchMoonPhase(lat, lon) {
-  const apiKey = "781aa2d69af74745906e01cc68c84207";
-  const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    const phase = data.moon_phase || "Neznámá fáze";
-    document.getElementById("moon-phase-label").textContent = `${phase} ${getMoonEmojiFromName(phase)}`;
-  } catch (err) {
-    console.error("Chyba při načítání fáze měsíce:", err);
-    document.getElementById("moon-phase-label").textContent = "Chyba načítání";
-  }
-}
-</script>
-<script>
-async function fetchPlanets(lat, lon) {
-  const apiKey = "781aa2d69af74745906e01cc68c84207";
-  const url = `https://api.ipgeolocation.io/astronomy?apiKey=${apiKey}&lat=${lat}&long=${lon}`;
-  const log = (msg) => document.getElementById("planet-log").textContent = msg;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const tbody = document.getElementById("planet-table");
-    tbody.innerHTML = "";
-
-    const planets = [
-      { name: "Mercury", altitude: data.mercury_altitude, azimuth: data.mercury_azimuth },
-      { name: "Venus", altitude: data.venus_altitude, azimuth: data.venus_azimuth },
-      { name: "Mars", altitude: data.mars_altitude, azimuth: data.mars_azimuth },
-      { name: "Jupiter", altitude: data.jupiter_altitude, azimuth: data.jupiter_azimuth },
-      { name: "Saturn", altitude: data.saturn_altitude, azimuth: data.saturn_azimuth }
-    ];
-
-    let anyVisible = false;
-
-    for (const planet of planets) {
-      if (planet.altitude > 5) {
-        const row = `<tr><td>${planet.name}</td><td>${parseFloat(planet.altitude).toFixed(1)}</td><td>${parseFloat(planet.azimuth).toFixed(1)}</td></tr>`;
-        tbody.innerHTML += row;
-        anyVisible = true;
-      }
-    }
-
-    if (!anyVisible) {
-      tbody.innerHTML = "<tr><td colspan='3'>Žádné planety nejsou dobře viditelné.</td></tr>";
-    }
-
-    log("✅ Hotovo.");
-  } catch (e) {
-    log("❌ Chyba při načítání planet: " + e.message);
-  }
-}
-</script>
-<script>
-let moonPhasesByDate = {};
-
-async function fetchMoonPhasesForecast(lat, lon) {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=moon_phase&timezone=Europe%2FPrague`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const dates = data.daily.time;
-    const phases = data.daily.moon_phase;
-
-    for (let i = 0; i < dates.length; i++) {
-      const phaseValue = phases[i];
-      const emoji = getMoonEmoji(phaseValue);
-      moonPhasesByDate[dates[i]] = emoji;
-    }
-  } catch (err) {
-    console.error("Chyba při načítání měsíčních fází:", err);
-  }
-}
-
-function getMoonEmoji(phase) {
-  if (phase === 0 || phase === 1) return "🌑";       // New Moon
-  if (phase > 0 && phase < 0.25) return "🌒";        // Waxing Crescent
-  if (phase === 0.25) return "🌓";                   // First Quarter
-  if (phase > 0.25 && phase < 0.5) return "🌔";      // Waxing Gibbous
-  if (phase === 0.5) return "🌕";                    // Full Moon
-  if (phase > 0.5 && phase < 0.75) return "🌖";      // Waning Gibbous
-  if (phase === 0.75) return "🌗";                   // Last Quarter
-  return "🌘";                                       // Waning Crescent
-}
-
-// Modify headers to include emoji after forecast data is loaded
-function addMoonPhasesToHeaders() {
-  Object.entries(moonPhasesByDate).forEach(([date, emoji], idx) => {
-    const headerEls = document.querySelectorAll(".forecast-day h3");
-    headerEls.forEach(header => {
-      if (header.textContent.includes(date) && !header.textContent.includes(emoji)) {
-        header.innerHTML = header.innerHTML.replace(date, date + " " + emoji);
-      }
-    });
-  });
-}
-
-// Patch fetchForecast to inject moon phase call
-const originalFetchForecast = window.fetchForecast;
-window.fetchForecast = async function(lat, lon) {
-  await fetchMoonPhasesForecast(lat, lon);
-  await originalFetchForecast(lat, lon);
-  addMoonPhasesToHeaders();
-};
-
-
-
-function getMoonEmojiFromName(name) {
-  const nameLower = name.toLowerCase().replace(/_/g, " ");
-  if (nameLower.includes("new moon")) return "🌑";
-  if (nameLower.includes("waxing crescent")) return "🌒";
-  if (nameLower.includes("first quarter")) return "🌓";
-  if (nameLower.includes("waxing gibbous")) return "🌔";
-  if (nameLower.includes("full moon")) return "🌕";
-  if (nameLower.includes("waning gibbous")) return "🌖";
-  if (nameLower.includes("last quarter")) return "🌗";
-  if (nameLower.includes("waning crescent")) return "🌘";
-  return "🌙";
-}
-
-</script><script>
-function centerTime(contentId, targetTime) {
-  const scrollContainer = document.querySelector(`#${contentId} .forecast-scroll`);
-  if (!scrollContainer) return;
-  const cards = scrollContainer.querySelectorAll('.forecast-card');
-
-  for (let i = 0; i < cards.length; i++) {
-    const card = cards[i];
-    const strong = card.querySelector('strong');
-    if (!strong) continue;
-    const time = strong.textContent.trim();
-    if (time === targetTime) {
-      const containerWidth = scrollContainer.clientWidth;
-      const cardOffset = card.offsetLeft;
-      const cardWidth = card.offsetWidth;
-      scrollContainer.scrollTo({
-        left: cardOffset - (containerWidth / 2) + (cardWidth / 2),
-        behavior: 'smooth'
-      });
-      break;
-    }
-  }
-}
-</script><script>
-
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll('.forecast-scroll-wrapper').forEach(wrapper => {
-    const scrollArea = wrapper.querySelector('.forecast-scroll');
-    const left = wrapper.querySelector('.scroll-left');
-    const right = wrapper.querySelector('.scroll-right');
-
-    let scrollInterval = null;
-
-    function updateArrowVisibility() {
-      const scrollLeft = scrollArea.scrollLeft;
-      const maxScrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth;
-      left.style.display = scrollLeft > 2 ? 'block' : 'none';
-      right.style.display = (maxScrollLeft - scrollLeft) > 2 ? 'block' : 'none';
-    }
-
-    function startScroll(direction) {
-      if (scrollInterval) clearInterval(scrollInterval);
-      scrollInterval = setInterval(() => {
-        scrollArea.scrollBy({ left: direction * 20, behavior: 'auto' });
-        updateArrowVisibility();
-      }, 16);
-    }
-
-    function stopScroll() {
-      if (scrollInterval) clearInterval(scrollInterval);
-      scrollInterval = null;
-    }
-
-    left.addEventListener('mousedown', () => startScroll(-1));
-    right.addEventListener('mousedown', () => startScroll(1));
-    left.addEventListener('mouseup', stopScroll);
-    right.addEventListener('mouseup', stopScroll);
-    left.addEventListener('mouseleave', stopScroll);
-    right.addEventListener('mouseleave', stopScroll);
-
-    left.addEventListener('touchstart', () => startScroll(-1));
-    right.addEventListener('touchstart', () => startScroll(1));
-    left.addEventListener('touchend', stopScroll);
-    right.addEventListener('touchend', stopScroll);
-
-    scrollArea.addEventListener('scroll', updateArrowVisibility);
-    window.addEventListener('resize', () => setTimeout(updateArrowVisibility, 300));
-
-    setTimeout(updateArrowVisibility, 800);
-  });
-});
-
-        updateArrowVisibility();
-      };
-      const start = () => interval = setInterval(step, 20);
-      const stop = () => clearInterval(interval);
-
-      element.addEventListener('mousedown', start);
-      element.addEventListener('mouseup', stop);
-      element.addEventListener('mouseleave', stop);
-      element.addEventListener('touchstart', start);
-      element.addEventListener('touchend', stop);
-    }
-
-    scrollSmooth(left, -1);
-    scrollSmooth(right, 1);
-
-    scrollArea.addEventListener('scroll', updateArrowVisibility);
-    window.addEventListener('resize', () => setTimeout(updateArrowVisibility, 200));
-
-    setTimeout(updateArrowVisibility, 600);
-  });
-});
-
-    });
-
-    right.addEventListener('click', () => {
-      scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
-    });
-
-    // Initial visibility check with delay to allow layout to render
-    setTimeout(updateArrowVisibility, 500);
-  });
-});
-
-      });
-    }
-    if (right && scrollArea) {
-      right.addEventListener('click', () => {
-        scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
-      });
-    }
-  });
-});
-
-      });
-    }
-    if (right && scrollArea) {
-      right.addEventListener('click', () => {
-        scrollArea.scrollBy({ left: 250, behavior: 'smooth' });
-      });
-    }
-  });
-});
-</script>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const menuButton = document.querySelector('.menu-button');
-    const menuContent = document.querySelector('.menu-content');
-    const submenuButton = document.querySelector('.submenu-button');
-    const submenuContent = document.querySelector('.submenu-content');
-
-    if (menuButton && menuContent) {
-      menuButton.addEventListener('click', function(e) {
-        e.stopPropagation();
-        menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
-      });
-      document.addEventListener('click', function() {
-        menuContent.style.display = 'none';
-        submenuContent.style.display = 'none';
-      });
-    }
-
-    if (submenuButton && submenuContent) {
-      submenuButton.addEventListener('click', function(e) {
-        e.stopPropagation();
-        submenuContent.style.display = submenuContent.style.display === 'block' ? 'none' : 'block';
-      });
-    }
-  });
-</script>
-
-
-
-<script>
-function toggleSubmenu(e) {
-  e.stopPropagation();
-  const content = e.target.nextElementSibling;
-  if (content) {
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-  }
-}
-</script>
-
-
-<script>
-function toggleMenu() {
-  const menu = document.getElementById("mainMenu");
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
-  document.getElementById("mapySubmenu").style.display = "none";
-}
-
-function toggleSubMenu() {
-  const submenu = document.getElementById("mapySubmenu");
-  submenu.style.display = submenu.style.display === "block" ? "none" : "block";
-}
-
-// Auto-hide menu on outside click
-document.addEventListener("click", function(event) {
-  const menu = document.getElementById("mainMenu");
-  const toggle = document.querySelector(".menu-toggle");
-  if (!menu.contains(event.target) && !toggle.contains(event.target)) {
-    menu.style.display = "none";
-    document.getElementById("mapySubmenu").style.display = "none";
-  }
-});
-</script>
-
-</body></html>
+</body>
+</html>
