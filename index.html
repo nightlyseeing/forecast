@@ -26,9 +26,33 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:radial-gradient(ellipse at top,#0b0c1a 0%,#1b2c3a 100%);color:var(--text);padding:16px;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+
+  /* === Page layout with ad gutters === */
+  .layout{
+    display:grid;
+    grid-template-columns: 220px minmax(300px, 1200px) 220px; /* ad-left | main | ad-right */
+    gap:16px;
+    align-items:start;
+    justify-content:center; /* centers the middle column, keeps gutters at sides */
+  }
+  .ad-slot{
+    position:sticky; top:16px;
+    min-height:200px;
+    background:rgba(0,0,0,0.15);
+    border:1px dashed rgba(255,255,255,0.2);
+    border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:12px; font-size:.95em; opacity:.8;
+  }
+  /* On narrow screens, collapse to single column and hide ad slots */
+  @media (max-width: 1200px){
+    .layout{ grid-template-columns: 1fr; }
+    .ad-slot{ display:none; }
+  }
+
   h1{margin:8px 0 16px;text-align:center;color:#fff;font-size:2.1rem;text-shadow:0 0 16px var(--accent)}
 
-  /* ===== Top bar with menu + diag + version ===== */
+  /* ===== Top bar with menu + version (API diag moved to Tools modal) ===== */
   .topbar{
     position:sticky; top:0; z-index:2000;
     display:flex; justify-content:space-between; align-items:center; gap:8px;
@@ -41,8 +65,9 @@
   }
   .menu-container{position:relative;align-self:flex-start}
   .menu-toggle{background:var(--accent);color:#000;font-weight:bold;padding:8px 14px;border-radius:10px;cursor:pointer;border:none;box-shadow:var(--shadow)}
-  .menu-dropdown{display:none;position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:220px;box-shadow:0 8px 16px rgba(0,0,0,.6);overflow:visible}
-  .menu-section{padding:6px 0;position:relative}
+  .menu-dropdown{display:none;position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:240px;box-shadow:0 8px 16px rgba(0,0,0,.6);overflow:visible}
+  .menu-section{padding:6px 0;position:relative;border-bottom:1px solid rgba(255,255,255,.06)}
+  .menu-section:last-child{border-bottom:none}
   .menu-item,.menu-link{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
   .menu-item:hover,.menu-link:hover{background:#2e8b57;color:#fff}
   .submenu{display:none;position:absolute;top:0;left:100%;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:230px;box-shadow:0 8px 16px rgba(0,0,0,.6);}
@@ -51,10 +76,20 @@
 
   .badges{display:flex;align-items:center;gap:8px;margin-left:auto}
   .version-tag{background:var(--accent);color:#000;font-weight:700;padding:6px 12px;border-radius:12px;box-shadow:var(--shadow)}
-  .diag-tag{position:relative;background:#243442;border:1px solid var(--border);padding:6px 12px;border-radius:12px;cursor:default}
-  .diag-tag:hover{filter:brightness(1.05)}
-  .diag-pop{display:none;position:absolute;top:115%;right:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:320px;max-width:400px;padding:10px 12px;box-shadow:0 0 16px rgba(0,255,195,.25); color:var(--text); z-index:2100}
-  .diag-tag:hover .diag-pop{display:block}
+
+  /* ===== Diagnostics modal ===== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6);
+    display:none; align-items:center; justify-content:center; z-index:3000;
+  }
+  .modal{
+    width:min(760px, 92vw); max-height:80vh; overflow:auto;
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    box-shadow:0 0 20px rgba(0,0,0,.6); padding:14px;
+  }
+  .modal header{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+  .modal header h2{margin:0; font-size:1.25rem}
+  .close-btn{background:none; color:#fff; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer}
   .diag-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
   .diag-item:last-child{border-bottom:none}
   .diag-name{opacity:.9}
@@ -95,8 +130,8 @@
   .tiny-help{font-size:.85em;opacity:.85;margin-left:6px}
 
   .forecast-content{display:none;padding:10px;position:relative}
-  .forecast-scroll-wrapper{position:relative}
-  .forecast-scroll{position:relative;display:flex;gap:8px;overflow-x:auto;padding:6px 0;z-index:2}
+  .forecast-scroll-wrapper{position:relative; overflow:hidden;} /* prevent vertical scrollbars */
+  .forecast-scroll{position:relative;display:flex;gap:8px;overflow-x:auto; overflow-y:hidden; padding:6px 0;z-index:2} /* hide vertical scroll */
   .bg-graph{position:absolute;top:0;left:0;z-index:1;pointer-events:none;}
   .forecast-card{min-width:80px;font-size:.9em;background:rgba(44,47,51,0.72);border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;position:relative;z-index:2}
   .scroll-left,.scroll-right{background:none;border:none;color:#fff;font-size:1.5em;padding:6px 10px;cursor:pointer;position:absolute;top:50%;transform:translateY(-50%);opacity:.6;text-shadow:0 0 6px rgba(255,255,255,.3);z-index:3}
@@ -113,91 +148,128 @@
   .version-wrap:hover .version-pop{display:block}
   .version-pop .row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
   .version-pop .row:last-child{border-bottom:none}
-
 </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="menu-container">
-    <button class="menu-toggle" onclick="toggleMenu()">📋 Menu</button>
-    <div class="menu-dropdown" id="mainMenu">
-      <div class="menu-section">
-        <div class="menu-item has-submenu">🗺️ Mapy ▸
-          <div class="submenu"><a class="menu-link" href="https://www.lightpollutionmap.info" target="_blank">💡 Light Pollution Map</a><a class="menu-link" href="https://www.windy.com" target="_blank">🌬️ Windy</a></div>
-        </div></div>
-    </div>
-  </div>
 
-  <div class="badges">
-    <div class="diag-tag">🧪 API
-      <div class="diag-pop" id="diagPop">
-        <div class="tiny" style="margin-bottom:6px;">Živá diagnostika API (najetím myši se provede test, klikem se test zopakuje).</div>
-        <div id="diagList"></div>
-        <div class="tiny" style="margin-top:8px;">Vlastní seznam můžeš dodat přes <code>window.DIAG_CUSTOM_ENDPOINTS</code> (viz JS).</div>
-      </div>
-    </div>
-    <div class="version-wrap"><div class="version-tag" id="versionTag">v0.3.3</div><div class="version-pop" id="versionPop"><div class="row"><div>Verze</div><div id="verVal">v0.3.3</div></div><div class="row"><div>Sestaveno</div><div id="buildVal">—</div></div><div class="row"><div>Prohlížeč</div><div id="uaVal">—</div></div></div></div>
-  </div>
-</div>
+<div class="layout">
+  <!-- Left ad gutter -->
+  <aside class="ad-slot">Rezervováno pro levý banner (220px)</aside>
 
-<h1>🪐 Astronomická předpověď</h1>
-
-<div class="controls">
-  <div class="input-wrapper">
-    <input id="cityInput" type="text" placeholder="Zadejte město..." oninput="autocompleteCities()"/>
-    <ul id="suggestions"></ul>
-  </div>
-  <button class="btn" onclick="getLocation()">📍 Moje poloha</button>
-</div>
-
-<div class="top-row">
-  <div class="left-col" id="leftTop">
-    <div class="panel">
-      <strong>📍 Informace o místě</strong>
-      <div class="kv" style="margin-top:8px;">
-        <span><strong>Název:</strong></span><span id="info-name">—</span>
-        <span><strong>GPS:</strong></span><span id="info-gps">—</span>
-        <span><strong>Mapa LP:</strong></span><span><a id="bortle-link" href="#" target="_blank" style="display:none;color:#00ffc3;text-decoration:underline;font-weight:bold;">Zobrazit Bortle</a></span>
-      </div>
-    </div>
-
-    <div class="panel">
-      <strong>🔭 Astronomické informace</strong>
-      <div style="margin-top:8px;">
-        <div><strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
-        <div id="phase-raw" class="small" style="display:none;margin-top:4px;"></div>
-      </div>
-      <div style="margin-top:12px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <strong>🪐 Viditelné planety ~22:00</strong>
-          <span id="planet-log" class="small" style="opacity:.85;"></span>
+  <!-- Main column -->
+  <main>
+    <div class="topbar">
+      <div class="menu-container">
+        <button class="menu-toggle" onclick="toggleMenu()">📋 Menu</button>
+        <div class="menu-dropdown" id="mainMenu">
+          <div class="menu-section">
+            <div class="menu-item has-submenu">🗺️ Mapy ▸
+              <div class="submenu">
+                <a class="menu-link" href="https://www.lightpollutionmap.info" target="_blank">💡 Light Pollution Map</a>
+                <a class="menu-link" href="https://www.windy.com" target="_blank">🌬️ Windy</a>
+              </div>
+            </div>
+          </div>
+          <div class="menu-section">
+            <div class="menu-item has-submenu">🛠️ Tools ▸
+              <div class="submenu">
+                <a class="menu-link" href="#" id="openDiag">🧪 API diagnostika</a>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="planets-list"></div>
+      </div>
+
+      <div class="badges">
+        <div class="version-wrap">
+          <div class="version-tag" id="versionTag">v0.3.4</div>
+          <div class="version-pop" id="versionPop">
+            <div class="row"><div>Verze</div><div id="verVal">v0.3.4</div></div>
+            <div class="row"><div>Sestaveno</div><div id="buildVal">—</div></div>
+            <div class="row"><div>Prohlížeč</div><div id="uaVal">—</div></div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="right-col">
-    <div class="panel" id="mapPanel">
-      <div id="map"></div>
-      <div id="mapZoomBadge" class="zoom-badge">Zoom: vypnuto</div>
-      <div class="map-tip">Klikni <b>pravým</b> na mapu pro zapnutí/vypnutí zoomu</div>
+    <h1>🪐 Astronomická předpověď</h1>
+
+    <div class="controls">
+      <div class="input-wrapper">
+        <input id="cityInput" type="text" placeholder="Zadejte město..." oninput="autocompleteCities()"/>
+        <ul id="suggestions"></ul>
+      </div>
+      <button class="btn" onclick="getLocation()">📍 Moje poloha</button>
     </div>
-  </div>
+
+    <div class="top-row">
+      <div class="left-col" id="leftTop">
+        <div class="panel">
+          <strong>📍 Informace o místě</strong>
+          <div class="kv" style="margin-top:8px;">
+            <span><strong>Název:</strong></span><span id="info-name">—</span>
+            <span><strong>GPS:</strong></span><span id="info-gps">—</span>
+            <span><strong>Mapa LP:</strong></span><span><a id="bortle-link" href="#" target="_blank" style="display:none;color:#00ffc3;text-decoration:underline;font-weight:bold;">Zobrazit Bortle</a></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <strong>🔭 Astronomické informace</strong>
+          <div style="margin-top:8px;">
+            <div><strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
+            <div id="phase-raw" class="small" style="display:none;margin-top:4px;"></div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <strong>🪐 Viditelné planety ~22:00</strong>
+              <span id="planet-log" class="small" style="opacity:.85;"></span>
+            </div>
+            <div id="planets-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel" id="mapPanel">
+          <div id="map"></div>
+          <div id="mapZoomBadge" class="zoom-badge">Zoom: vypnuto</div>
+          <div class="map-tip">Klikni <b>pravým</b> na mapu pro zapnutí/vypnutí zoomu</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spinner" id="spinner" style="margin-top:16px;"></div>
+    <div id="forecast" style="margin-top:8px;"></div>
+
+    <div class="footer">
+      Zdroj fází: ipgeolocation.io • Počasí a geokódování: Open-Meteo • Planety: Astronomy Engine (fallback ipgeolocation) • Mapa: Leaflet & OSM
+    </div>
+  </main>
+
+  <!-- Right ad gutter -->
+  <aside class="ad-slot">Rezervováno pro pravý banner (220px)</aside>
 </div>
 
-<div class="spinner" id="spinner" style="margin-top:16px;"></div>
-<div id="forecast" style="margin-top:8px;"></div>
-
-<div class="footer">
-  Zdroj fází: ipgeolocation.io • Počasí a geokódování: Open-Meteo • Planety: Astronomy Engine (fallback ipgeolocation) • Mapa: Leaflet & OSM
+<!-- Diagnostics modal (opened from Tools submenu) -->
+<div class="modal-overlay" id="diagOverlay" role="dialog" aria-modal="true" aria-labelledby="diagTitle">
+  <div class="modal">
+    <header>
+      <h2 id="diagTitle">🧪 API diagnostika</h2>
+      <div>
+        <button class="btn" id="rerunDiag" title="Spustit znovu">Spustit znovu</button>
+        <button class="close-btn" id="closeDiag">Zavřít</button>
+      </div>
+    </header>
+    <div class="tiny" style="margin-bottom:6px;">Při otevření se spustí test, tlačítkem „Spustit znovu“ lze opakovat. Vlastní seznam koncových bodů můžeš dodat přes <code>window.DIAG_CUSTOM_ENDPOINTS</code>.</div>
+    <div id="diagList"></div>
+  </div>
 </div>
 
 <script>
 const IPGEO_API_KEY="781aa2d69af74745906e01cc68c84207";
 const DEBUG=new URLSearchParams(location.search).has("debug");
 
-const VERSION = "v0.3.3";
+const VERSION = "v0.3.4";
 const BUILD_DATE = "2025-09-18"; // Europe/Prague
 (function setupVersionHover(){
   const tag = document.getElementById('versionTag');
@@ -211,7 +283,7 @@ const BUILD_DATE = "2025-09-18"; // Europe/Prague
 })();
 
 
-/* ===== Diagnostics badge ===== */
+/* ===== Diagnostics (moved to Tools modal) ===== */
 const DEFAULT_ENDPOINTS = [
   { name: "Open-Meteo Forecast", url: "https://api.open-meteo.com/v1/forecast?latitude=50.08&longitude=14.44&hourly=temperature_2m&timezone=Europe%2FPrague" },
   { name: "ipgeolocation Astronomy", url: `https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=50.08&long=14.44` },
@@ -220,9 +292,7 @@ const DEFAULT_ENDPOINTS = [
 const ENDPOINTS = (window.DIAG_CUSTOM_ENDPOINTS && Array.isArray(window.DIAG_CUSTOM_ENDPOINTS) && window.DIAG_CUSTOM_ENDPOINTS.length)
   ? window.DIAG_CUSTOM_ENDPOINTS : DEFAULT_ENDPOINTS;
 
-const diagTag = document.querySelector('.diag-tag');
 const diagList = document.getElementById('diagList');
-
 function el(tag, attrs={}, html=""){
   const e=document.createElement(tag);
   for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v);
@@ -248,20 +318,30 @@ async function ping(url, timeout=4500){
   }
 }
 async function runDiagnostics(){
+  if(!diagList) return;
   diagList.innerHTML = "";
   for(const ep of ENDPOINTS){
     const row = statusRow(ep.name, 'pending', 'čekám…');
     diagList.appendChild(row);
     ping(ep.url).then(res=>{
-      if(res.ok){ row.querySelector('.diag-status').className='diag-status ok'; row.querySelector('.diag-status').textContent='OK '+res.status; }
-      else { row.querySelector('.diag-status').className='diag-status fail'; row.querySelector('.diag-status').textContent='Chyba '+res.status; }
+      const s = row.querySelector('.diag-status');
+      if(res.ok){ s.className='diag-status ok'; s.textContent='OK '+res.status; }
+      else { s.className='diag-status fail'; s.textContent='Chyba '+res.status; }
     });
   }
 }
-if(diagTag){
-  diagTag.addEventListener('mouseenter', ()=>{ runDiagnostics(); });
-  diagTag.addEventListener('click', (e)=>{ e.stopPropagation(); runDiagnostics(); });
+function openDiagModal(){
+  const overlay = document.getElementById('diagOverlay');
+  if(overlay){ overlay.style.display='flex'; runDiagnostics(); }
 }
+function closeDiagModal(){
+  const overlay = document.getElementById('diagOverlay');
+  if(overlay){ overlay.style.display='none'; }
+}
+document.getElementById('openDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); openDiagModal(); });
+document.getElementById('closeDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); closeDiagModal(); });
+document.getElementById('rerunDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); runDiagnostics(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDiagModal(); } });
 
 /* ===== Menu ===== */
 function toggleMenu(){const m=document.getElementById("mainMenu");m.style.display=m.style.display==="block"?"none":"block"}
@@ -272,8 +352,6 @@ const $=(id)=>document.getElementById(id);
 function showSpinner(b){$("spinner").style.display=b?"block":"none"}
 function getDayName(d){const today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Prague'});if(d===today)return"Dnes";const arr=['Neděle','Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota'];return arr[new Date(d+'T00:00:00').getDay()]}
 function getWeatherIcon(c,r){
-  // Pozn.: karta počasí dál ukazuje počasí (☁️/🌤️/☀️ …),
-  // ale ikona režimu seeing je 👁️ – viz tlačítko níže.
   if(r>2)return'🌧️';
   if(r>0)return'🌦️';
   if(c>75)return'☁️';
@@ -400,12 +478,8 @@ function scoreForMode(entry, mode, dateStr){
   return visibilityScore(entry.cloud ?? 0, entry.rain ?? 0, dateStr);
 }
 
-/* ===== Graph drawing =====
-   - seeing (👁️): baseline uprostřed (zelená ↑ / červená ↓)
-   - rain & wind: baseline dole, plocha nahoru; výplň = vertikální přechod (světlá ↓ → tmavá ↑)
-*/
+/* ===== Graph drawing ===== */
 function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
-  // Guard: use only the provided entries for a single date span of hours
   if(Array.isArray(entries)){ const dates = new Set(entries.map(e=>e.date)); if(dates.size>1){ entries = entries.filter(e=> e.date===date); } }
 
   const old = scrollEl.querySelector('.bg-graph');
@@ -415,8 +489,8 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
   if(!Number.isFinite(totalW) || totalW <= 0) totalW = Math.max(1, scrollEl.scrollWidth);
 
   const totalH = scrollEl.getBoundingClientRect().height || 140;
-  const svgNS="http://www.w3.org/2000/svg";
 
+  const svgNS="http://www.w3.org/2000/svg";
   const wrap = document.createElement('div');
   wrap.className = "bg-graph";
   wrap.style.width = totalW + "px";
@@ -427,13 +501,12 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
   svg.setAttribute('height', totalH);
   svg.style.display='block';
 
-  /* defs: gradienty pro rain & wind */
   const defs = document.createElementNS(svgNS,'defs');
   const mkGrad = (id, lowVar, highVar) => {
     const lg = document.createElementNS(svgNS,'linearGradient');
     lg.setAttribute('id', id);
     lg.setAttribute('x1','0'); lg.setAttribute('y1','1');
-    lg.setAttribute('x2','0'); lg.setAttribute('y2','0'); // vertikálně dole→nahoře
+    lg.setAttribute('x2','0'); lg.setAttribute('y2','0');
     const stop1 = document.createElementNS(svgNS,'stop');
     stop1.setAttribute('offset','0%');  stop1.setAttribute('stop-color', getComputedStyle(document.documentElement).getPropertyValue(lowVar).trim() || 'white');
     const stop2 = document.createElementNS(svgNS,'stop');
@@ -457,12 +530,12 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     svg.appendChild(baseline);
 
     const n = entries.length;
-    if(n<2){ wrap.appendChild(svg); scrollEl.insertBefore(wrap, scrollEl.firstChild); return; }
+    if(n<2){ scrollEl.insertAdjacentElement('afterbegin', wrap); wrap.appendChild(svg); return; }
 
     const points = [];
     for(let i=0;i<n;i++){
       const x = (totalW-1) * (i/(n-1));
-      const score = scoreForMode(entries[i], 'seeing', dateStr); // 0..100 (víc nahoru = lepší)
+      const score = scoreForMode(entries[i], 'seeing', dateStr);
       const norm = score - 50; // -50..+50
       const y = midY - (norm/50)*amp;
       points.push([x,y]);
@@ -470,7 +543,7 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
 
     const makeAreaPath = (clampFn, fill) => {
       const dTop = points.map(([x,y],i)=> (i===0 ? `M ${x} ${clampFn(y)}` : `L ${x} ${clampFn(y)}`)).join(' ');
-      const d = `${dTop} L ${points[n-1][0]} ${midY} L ${points[0][0]} ${midY} Z`;
+      const d = `${dTop} L ${points[n-1][0]} ${midY} L ${points[0][0]} ${midY} Z`
       const p = document.createElementNS(svgNS, 'path');
       p.setAttribute('d', d);
       p.setAttribute('fill', fill);
@@ -488,9 +561,8 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     linePath.setAttribute('stroke-width', '1.6');
     svg.appendChild(linePath);
   } else {
-    // rain / wind: baseline dole, plocha nahoru s gradientem
-    const baseY = totalH - 2;    // jemná rezerva
-    const topPad = 6;            // rezerva od horní hrany
+    const baseY = totalH - 2;
+    const topPad = 6;
     const usableH = Math.max(20, baseY - topPad);
 
     const baseLine = document.createElementNS(svgNS,'line');
@@ -500,17 +572,16 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     svg.appendChild(baseLine);
 
     const n = entries.length;
-    if(n<2){ wrap.appendChild(svg); scrollEl.insertBefore(wrap, scrollEl.firstChild); return; }
+    if(n<2){ scrollEl.insertAdjacentElement('afterbegin', wrap); wrap.appendChild(svg); return; }
 
     const points=[];
     for(let i=0;i<n;i++){
       const x=(totalW-1)*(i/(n-1));
-      const score=scoreForMode(entries[i], mode, dateStr); // 0..100
+      const score=scoreForMode(entries[i], mode, dateStr);
       const y= baseY - (score/100)*usableH;
       points.push([x,y]);
     }
 
-    // Plocha
     const dTop = points.map(([x,y],i)=> (i?`L ${x} ${y}`:`M ${x} ${y}`)).join(' ');
     const dArea = `${dTop} L ${points[n-1][0]} ${baseY} L ${points[0][0]} ${baseY} Z`;
     const area = document.createElementNS(svgNS,'path');
@@ -519,7 +590,6 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     area.setAttribute('stroke','none');
     svg.appendChild(area);
 
-    // Linka nahoře – tmavý odstín
     const line=document.createElementNS(svgNS,'path');
     const dLine = points.map(([x,y],i)=> (i?`L ${x} ${y}`:`M ${x} ${y}`)).join(' ');
     line.setAttribute('d', dLine);
@@ -547,8 +617,8 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
 }
 
 /* ===== Forecast ===== */
-window._graphData = {}; // {contentId: {entries, date}}
-window._graphMode = {}; // {contentId: 'seeing'|'wind'|'rain'}
+window._graphData = {};
+window._graphMode = {};
 
 async function fetchForecast(lat,lon){
   showSpinner(true);
@@ -562,7 +632,6 @@ async function fetchForecast(lat,lon){
 for(let i=0;i<time.length;i++){
   let [date,hour] = time[i].split('T');
   if(hour === '24:00'){
-    // Normalize 24:00 to next day 00:00 so it doesn't appear under the same date
     const dt = new Date(date + 'T00:00:00');
     const next = new Date(dt.getTime() + 24*60*60*1000);
     const y = next.getFullYear();
@@ -573,7 +642,6 @@ for(let i=0;i<time.length;i++){
   }
   const entry={time:hour,temp:temperature_2m[i],cloud:cloudcover[i],rain:precipitation[i],wind:windspeed_10m[i],date};
   if(!days[date]) days[date]=[];
-  // Guard: only push entries that exactly match the date key.
   if(time[i].startsWith(date+'T')){
     days[date].push(entry);
   }
@@ -582,7 +650,6 @@ for(let i=0;i<time.length;i++){
   let idx=0;
   Object.entries(days).sort((a,b)=> a[0]<b[0]? -1 : a[0]>b[0]? 1 : 0).forEach(([date,entries])=>{
     if(!entries.length) return;
-    // Start today's forecast from the current hour (Europe/Prague)
     try{
       const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Prague' });
       if(date === todayLocal){
@@ -648,13 +715,11 @@ for(let i=0;i<time.length;i++){
     section.appendChild(content);
     div.appendChild(section);
 
-    // Save data & draw default (seeing) graph
     window._graphData[contentId] = { entries, date };
     window._graphMode[contentId] = 'seeing';
     requestAnimationFrame(()=> drawBackgroundGraph(scroll, entries, date, 'seeing'));
   });
 
-  // po vykreslení uprav výšku mapy
   syncMapHeight();
 }
 
