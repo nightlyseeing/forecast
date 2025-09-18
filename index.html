@@ -52,10 +52,9 @@
 
   h1{margin:8px 0 16px;text-align:center;color:#fff;font-size:2.1rem;text-shadow:0 0 16px var(--accent)}
 
-  /* ===== Top bar with menu + version (API diag moved to Tools modal) ===== */
-  .topbar{
-    position:sticky; top:0; z-index:2000;
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
+  /* ===== Top bar with menu + centered NOW status ===== */
+  .topbar{ position:sticky; top:0; z-index:15000; /* ↑ Fix: topbar nad vyhledávačem i jeho návrhy */
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center;
     padding:8px 10px;
     background:linear-gradient(180deg, rgba(11,12,16,0.92) 0%, rgba(11,12,16,0.70) 100%);
     border:1px solid rgba(255,255,255,0.08);
@@ -63,19 +62,29 @@
     backdrop-filter:saturate(140%) blur(6px);
     box-shadow:0 6px 18px rgba(0,0,0,.35);
   }
-  .menu-container{position:relative;align-self:flex-start}
+  .menu-container{position:relative;align-self:flex-start; z-index:9000}
   .menu-toggle{background:var(--accent);color:#000;font-weight:bold;padding:8px 14px;border-radius:10px;cursor:pointer;border:none;box-shadow:var(--shadow)}
-  .menu-dropdown{display:none;position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:240px;box-shadow:0 8px 16px rgba(0,0,0,.6);overflow:visible}
+  .menu-dropdown{display:none;position:absolute;top:110%;left:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:240px;box-shadow:0 8px 16px rgba(0,0,0,.6);overflow:visible; z-index:9500}
   .menu-section{padding:6px 0;position:relative;border-bottom:1px solid rgba(255,255,255,.06)}
   .menu-section:last-child{border-bottom:none}
   .menu-item,.menu-link{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;color:var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
   .menu-item:hover,.menu-link:hover{background:#2e8b57;color:#fff}
-  .submenu{display:none;position:absolute;top:0;left:100%;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:230px;box-shadow:0 8px 16px rgba(0,0,0,.6);}
+  .submenu{display:none;position:absolute;top:0;left:100%;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:230px;box-shadow:0 8px 16px rgba(0,0,0,.6); z-index:9600;}
   .has-submenu{position:relative}
   .has-submenu:hover>.submenu{display:block}
 
-  .badges{display:flex;align-items:center;gap:8px;margin-left:auto}
-  .version-tag{background:var(--accent);color:#000;font-weight:700;padding:6px 12px;border-radius:12px;box-shadow:var(--shadow)}
+  .now-status{
+    justify-self:center; /* center in grid middle column */
+    display:flex; align-items:center; gap:10px;
+    padding:6px 12px; border-radius:999px;
+    border:1px solid var(--border);
+    background:rgba(0,0,0,.35);
+    box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-weight:700;
+  }
+  .now-status .place{opacity:.9; font-weight:600; margin-right:4px}
+  .now-status .sep{opacity:.4}
+  .now-status .val{min-width:50px; text-align:center}
 
   /* ===== Diagnostics modal ===== */
   .modal-overlay{
@@ -99,10 +108,10 @@
 
   /* ===== Controls + layout ===== */
   .controls{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
-  .input-wrapper{position:relative}
+  .input-wrapper{position:relative; z-index:4000}
   #cityInput{width:360px;max-width:100%;padding:10px 36px 10px 12px;border-radius:10px;border:2px solid var(--accent);background:#111;color:#00ffc3;font-weight:700;box-shadow:var(--shadow)}
   .btn{background:#7a6cb6;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;box-shadow:0 0 10px rgba(122,108,182,.5)}
-  #suggestions{position:absolute;top:100%;left:0;right:0;background:#121212;border:1px solid var(--border);border-radius:10px;list-style:none;padding:0;margin:6px 0 0 0;display:none;overflow:hidden;z-index:30}
+  #suggestions{position:absolute;top:100%;left:0;right:0;background:#121212;border:1px solid var(--border);border-radius:10px;list-style:none;padding:0;margin:6px 0 0 0;display:none;overflow:hidden;z-index:5000}
   #suggestions li{padding:10px 12px;cursor:pointer;color:var(--text)} #suggestions li:hover{background:#243442}
 
   .top-row{display:grid;grid-template-columns: minmax(300px, 1fr) minmax(280px, 1fr);gap:16px;align-items:start}
@@ -113,7 +122,7 @@
   .panel strong{color:var(--accent)}
   .kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 10px}
 
-  #mapPanel{padding:0;overflow:hidden;position:relative}
+  #mapPanel{padding:0;overflow:hidden;position:relative; z-index:1}
   #map{width:100%;height:100%}
   .zoom-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:.85em;border:1px solid rgba(255,255,255,.2);z-index:2}
   .map-tip{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 8px;border-radius:8px;font-size:.9em;border:1px solid rgba(255,255,255,.2);z-index:2}
@@ -141,13 +150,6 @@
   .footer{text-align:center;opacity:.8;margin-top:10px;font-size:.95em}
   .small{font-size:.92em;opacity:.9}
   .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#243442;border:1px solid var(--border);margin:4px 6px 0 0}
-
-  .version-wrap{position:relative}
-  .version-tag{position:relative; cursor:default}
-  .version-pop{display:none;position:absolute;top:115%;right:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;min-width:260px;max-width:420px;padding:10px 12px;box-shadow:0 0 16px rgba(0,255,195,.25); color:var(--text); z-index:2100}
-  .version-wrap:hover .version-pop{display:block}
-  .version-pop .row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-  .version-pop .row:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -171,25 +173,37 @@
             </div>
           </div>
           <div class="menu-section">
-            <div class="menu-item has-submenu">🛠️ Tools ▸
+            <div class="menu-item has-submenu">🛠️ Nástroje ▸
               <div class="submenu">
                 <a class="menu-link" href="#" id="openDiag">🧪 API diagnostika</a>
+              </div>
+            </div>
+          </div>
+          <!-- NOVĚ: Verze v menu s hover zobrazením -->
+          <div class="menu-section">
+            <div class="menu-item has-submenu">ℹ️ Verze ▸
+              <div class="submenu">
+                <div class="menu-item" id="versionInMenuRow">Aktuální: <strong id="versionInMenu">—</strong></div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="badges">
-        <div class="version-wrap">
-          <div class="version-tag" id="versionTag">v0.3.4</div>
-          <div class="version-pop" id="versionPop">
-            <div class="row"><div>Verze</div><div id="verVal">v0.3.4</div></div>
-            <div class="row"><div>Sestaveno</div><div id="buildVal">—</div></div>
-            <div class="row"><div>Prohlížeč</div><div id="uaVal">—</div></div>
-          </div>
-        </div>
+      <!-- Prostřední (center) buňka gridu: NOW status -->
+      <div id="nowStatus" class="now-status" style="display:none">
+        <span class="place" id="nowPlace">—</span><span class="sep">|</span>
+        <span>👁️ <span class="val" id="nowSeeing">—</span></span>
+        <span class="sep">•</span>
+        <span>💨 <span class="val" id="nowWind">—</span></span>
+        <span class="sep">•</span>
+        <span>🌧️ <span class="val" id="nowRain">—</span></span>
+        <span class="sep">•</span>
+        <span>🌡️ <span class="val" id="nowTemp">—</span></span>
       </div>
+
+      <!-- Pravá (třetí) buňka gridu prázdná pro symetrii -->
+      <div></div>
     </div>
 
     <h1>🪐 Astronomická předpověď</h1>
@@ -217,7 +231,6 @@
           <strong>🔭 Astronomické informace</strong>
           <div style="margin-top:8px;">
             <div><strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
-            <div id="phase-raw" class="small" style="display:none;margin-top:4px;"></div>
           </div>
           <div style="margin-top:12px;">
             <div style="display:flex;align-items:center;gap:8px;">
@@ -250,7 +263,7 @@
   <aside class="ad-slot">Rezervováno pro pravý banner (220px)</aside>
 </div>
 
-<!-- Diagnostics modal (opened from Tools submenu) -->
+<!-- Diagnostics modal -->
 <div class="modal-overlay" id="diagOverlay" role="dialog" aria-modal="true" aria-labelledby="diagTitle">
   <div class="modal">
     <header>
@@ -260,92 +273,26 @@
         <button class="close-btn" id="closeDiag">Zavřít</button>
       </div>
     </header>
-    <div class="tiny" style="margin-bottom:6px;">Při otevření se spustí test, tlačítkem „Spustit znovu“ lze opakovat. Vlastní seznam koncových bodů můžeš dodat přes <code>window.DIAG_CUSTOM_ENDPOINTS</code>.</div>
+    <div class="tiny" style="margin-bottom:6px;">Při otevření se spustí test, tlačítkem „Spustit znovu“ lze opakovat.</div>
     <div id="diagList"></div>
   </div>
 </div>
 
 <script>
 const IPGEO_API_KEY="781aa2d69af74745906e01cc68c84207";
-const DEBUG=new URLSearchParams(location.search).has("debug");
-
-const VERSION = "v0.3.4";
-const BUILD_DATE = "2025-09-18"; // Europe/Prague
-(function setupVersionHover(){
-  const tag = document.getElementById('versionTag');
-  const ver = document.getElementById('verVal');
-  const build = document.getElementById('buildVal');
-  const ua = document.getElementById('uaVal');
-  if(tag){ tag.textContent = VERSION; }
-  if(ver){ ver.textContent = VERSION; }
-  if(build){ build.textContent = BUILD_DATE; }
-  if(ua){ ua.textContent = (navigator.userAgent || "—"); }
-})();
-
-
-/* ===== Diagnostics (moved to Tools modal) ===== */
-const DEFAULT_ENDPOINTS = [
-  { name: "Open-Meteo Forecast", url: "https://api.open-meteo.com/v1/forecast?latitude=50.08&longitude=14.44&hourly=temperature_2m&timezone=Europe%2FPrague" },
-  { name: "ipgeolocation Astronomy", url: `https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=50.08&long=14.44` },
-  { name: "Nominatim Reverse", url: "https://nominatim.openstreetmap.org/reverse?format=json&lat=50.08&lon=14.44&zoom=10&addressdetails=1" }
-];
-const ENDPOINTS = (window.DIAG_CUSTOM_ENDPOINTS && Array.isArray(window.DIAG_CUSTOM_ENDPOINTS) && window.DIAG_CUSTOM_ENDPOINTS.length)
-  ? window.DIAG_CUSTOM_ENDPOINTS : DEFAULT_ENDPOINTS;
-
-const diagList = document.getElementById('diagList');
-function el(tag, attrs={}, html=""){
-  const e=document.createElement(tag);
-  for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v);
-  if(html) e.innerHTML=html;
-  return e;
-}
-function statusRow(name, statusClass, text){
-  const row = el('div', {class:'diag-item'});
-  row.appendChild(el('div',{class:'diag-name'}, name));
-  row.appendChild(el('div',{class:'diag-status '+statusClass}, text));
-  return row;
-}
-async function ping(url, timeout=4500){
-  const controller = new AbortController();
-  const id = setTimeout(()=>controller.abort(), timeout);
-  try{
-    const r = await fetch(url, {signal: controller.signal, method:'GET'});
-    clearTimeout(id);
-    return {ok:r.ok, status:r.status};
-  }catch(e){
-    clearTimeout(id);
-    return {ok:false, status:'—'};
-  }
-}
-async function runDiagnostics(){
-  if(!diagList) return;
-  diagList.innerHTML = "";
-  for(const ep of ENDPOINTS){
-    const row = statusRow(ep.name, 'pending', 'čekám…');
-    diagList.appendChild(row);
-    ping(ep.url).then(res=>{
-      const s = row.querySelector('.diag-status');
-      if(res.ok){ s.className='diag-status ok'; s.textContent='OK '+res.status; }
-      else { s.className='diag-status fail'; s.textContent='Chyba '+res.status; }
-    });
-  }
-}
-function openDiagModal(){
-  const overlay = document.getElementById('diagOverlay');
-  if(overlay){ overlay.style.display='flex'; runDiagnostics(); }
-}
-function closeDiagModal(){
-  const overlay = document.getElementById('diagOverlay');
-  if(overlay){ overlay.style.display='none'; }
-}
-document.getElementById('openDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); openDiagModal(); });
-document.getElementById('closeDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); closeDiagModal(); });
-document.getElementById('rerunDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); runDiagnostics(); });
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDiagModal(); } });
+const VERSION = "v0.3.8";
 
 /* ===== Menu ===== */
 function toggleMenu(){const m=document.getElementById("mainMenu");m.style.display=m.style.display==="block"?"none":"block"}
 document.addEventListener("click",(e)=>{const m=document.getElementById("mainMenu");const t=document.querySelector(".menu-toggle");if(m&&t&&!m.contains(e.target)&&!t.contains(e.target))m.style.display="none"});
+
+/* Po načtení: doplnit verzi do menu + tooltip na tlačítko */
+window.addEventListener('DOMContentLoaded', ()=>{
+  const vSpan = document.getElementById('versionInMenu');
+  if(vSpan) vSpan.textContent = VERSION;
+  const btn = document.querySelector('.menu-toggle');
+  if(btn) btn.title = `Verze ${VERSION}`;
+});
 
 /* ===== Helpers ===== */
 const $=(id)=>document.getElementById(id);
@@ -378,11 +325,27 @@ window.addEventListener("resize", syncMapHeight);
 let selectedCity=null;
 async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);fetchPlanets(c.latitude,c.longitude);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
 
-async function getLocation(){if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");navigator.geolocation.getCurrentPosition(async p=>{const lat=p.coords.latitude,lon=p.coords.longitude;const name=await reverseGeocode(lat,lon);const c={name,country:"",latitude:lat,longitude:lon};selectedCity=c;updateLocationInfo(c);initMap(lat,lon);fetchForecast(lat,lon);fetchMoonPhase(lat,lon);fetchPlanets(lat,lon)},e=>alert("Nepodařilo se zjistit polohu."))}
+async function getLocation(){
+  if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");
+  navigator.geolocation.getCurrentPosition(async p=>{
+    const lat=p.coords.latitude,lon=p.coords.longitude;
+    const name=await reverseGeocode(lat,lon);
+    const c={name,country:"",latitude:lat,longitude:lon};
+    selectedCity=c;
+    updateLocationInfo(c);
+    initMap(lat,lon);
+    fetchForecast(lat,lon);
+    fetchMoonPhase(lat,lon);
+    fetchPlanets(lat,lon);
+    /* NOVĚ: po kliknutí na Moje poloha vyčistit vstup i návrhy */
+    const input=$("cityInput"); if(input) input.value="";
+    const s=$("suggestions"); if(s) { s.innerHTML=""; s.style.display="none"; }
+  },e=>alert("Nepodařilo se zjistit polohu."));
+}
 
 async function reverseGeocode(lat,lon){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);const d=await r.json();return d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||d.display_name||`${lat.toFixed(4)}, ${lon.toFixed(4)}`}catch{return `${lat.toFixed(4)}, ${lon.toFixed(4)}`}} 
 
-function updateLocationInfo(c){const name=c.name||"-";const country=c.country||"";const lat=typeof c.latitude==="number"?c.latitude:null;const lon=typeof c.longitude==="number"?c.longitude:null;$("info-name").innerHTML=country?`<span style="color:#00ffc3;font-weight:bold;">${name}</span>, ${country}`:`<span style="color:#00ffc3;font-weight:bold;">${name}</span>`;$("info-gps").textContent=(lat!=null&&lon!=null)?`${lat.toFixed(4)}, ${lon.toFixed(4)}`:"—";const link=$("bortle-link");if(lat!=null&&lon!=null){link.href=`https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;link.style.display="inline"}else{link.style.display="none"}}
+function updateLocationInfo(c){const name=c.name||"-";const country=c.country||"";const lat=typeof c.latitude==="number"?c.latitude:null;const lon=typeof c.longitude==="number"?c.longitude:null;$("info-name").innerHTML=country?`<span style="color:#00ffc3;font-weight:bold;">${name}</span>, ${country}`:`<span style="color:#00ffc3;font-weight:bold;">${name}</span>`;$("info-gps").textContent=(lat!=null&&lon!=null)?`${lat.toFixed(4)}, ${lon.toFixed(4)}`:"—";const link=$("bortle-link");if(lat!=null&&lon!=null){link.href=`https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;link.style.display="inline"}else{link.style.display="none"};const np=$("nowPlace");if(np){np.textContent = name || "—";}}
 
 /* ===== Map on the right ===== */
 let map=null,marker=null,zoomEnabled=false,zoomControl=null;
@@ -409,6 +372,8 @@ function initMap(lat,lon){
     map.setView([lat,lon], 10);
     marker.setLatLng([lat,lon]);
   }
+  // initialize RainViewer overlays once when map is ready
+  enableWeatherLayers();
   setTimeout(()=> { map.invalidateSize(); syncMapHeight(); }, 150);
 }
 
@@ -422,8 +387,7 @@ async function fetchMoonPhase(lat,lon){
     const d=await r.json();
     const p=d.moon_phase||"Neznámá fáze";
     $("moon-phase-label").textContent=getMoonEmojiFromName(p);
-    if(DEBUG){$("phase-raw").style.display="block";$("phase-raw").textContent=`API: ${p} (${d.moon_illumination||'?' }%)`}
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Prague' });
     const illumPct = Number(d.moon_illumination);
     if(Number.isFinite(illumPct)){
       moonIllumByDate[today] = Math.max(0, Math.min(1, illumPct/100));
@@ -431,7 +395,6 @@ async function fetchMoonPhase(lat,lon){
   }catch(e){
     console.error("Chyba při načítání fáze:",e);
     $("moon-phase-label").textContent="Chyba načítání";
-    $("phase-raw").textContent="";
   }
 }
 
@@ -480,8 +443,6 @@ function scoreForMode(entry, mode, dateStr){
 
 /* ===== Graph drawing ===== */
 function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
-  if(Array.isArray(entries)){ const dates = new Set(entries.map(e=>e.date)); if(dates.size>1){ entries = entries.filter(e=> e.date===date); } }
-
   const old = scrollEl.querySelector('.bg-graph');
   if(old) old.remove();
 
@@ -530,7 +491,7 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     svg.appendChild(baseline);
 
     const n = entries.length;
-    if(n<2){ scrollEl.insertAdjacentElement('afterbegin', wrap); wrap.appendChild(svg); return; }
+    if(n<2){ wrap.appendChild(svg); scrollEl.insertAdjacentElement('afterbegin', wrap); return; }
 
     const points = [];
     for(let i=0;i<n;i++){
@@ -572,7 +533,7 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
     svg.appendChild(baseLine);
 
     const n = entries.length;
-    if(n<2){ scrollEl.insertAdjacentElement('afterbegin', wrap); wrap.appendChild(svg); return; }
+    if(n<2){ wrap.appendChild(svg); scrollEl.insertAdjacentElement('afterbegin', wrap); return; }
 
     const points=[];
     for(let i=0;i<n;i++){
@@ -604,21 +565,40 @@ function drawBackgroundGraph(scrollEl, entries, dateStr, mode='seeing'){
 
   wrap.appendChild(svg);
   scrollEl.insertBefore(wrap, scrollEl.firstChild);
-
-  if(!scrollEl._graphResizeObs){
-    const ro = new ResizeObserver(()=> {
-      const id = scrollEl.closest('.forecast-content')?.id;
-      const modeNow = (window._graphMode && id) ? (window._graphMode[id] || 'seeing') : 'seeing';
-      drawBackgroundGraph(scrollEl, entries, dateStr, modeNow);
-    });
-    ro.observe(scrollEl);
-    scrollEl._graphResizeObs = ro;
-  }
 }
 
 /* ===== Forecast ===== */
 window._graphData = {};
 window._graphMode = {};
+
+function updateNowStatusFromArrays(timeArr, tempArr, cloudArr, rainArr, windArr){
+  if(!(timeArr && timeArr.length)) return;
+  try{
+    const nowDate = new Date();
+    const tz = 'Europe/Prague';
+    const y = nowDate.toLocaleString('en-CA', { timeZone: tz, year:'numeric' });
+    const m = nowDate.toLocaleString('en-CA', { timeZone: tz, month:'2-digit' });
+    const d = nowDate.toLocaleString('en-CA', { timeZone: tz, day:'2-digit' });
+    const hh = nowDate.toLocaleString('en-GB', { timeZone: tz, hour:'2-digit', hour12:false });
+    const target = `${y}-${m}-${d}T${hh}:00`;
+    let idx = timeArr.indexOf(target);
+    if(idx < 0){ // pick next closest hour in future, else last
+      idx = timeArr.findIndex(t => t >= target);
+      if(idx < 0) idx = timeArr.length - 1;
+    }
+    const [dateStr] = timeArr[idx].split('T');
+    const temp = Math.round(tempArr[idx]);
+    const cloud = cloudArr[idx];
+    const rain = rainArr[idx];
+    const wind = Math.round(windArr[idx]);
+    const seeing = visibilityScore(cloud, rain, dateStr);
+    $("nowTemp").textContent = `${temp}°C`;
+    $("nowWind").textContent = `${wind} km/h`;
+    $("nowRain").textContent = `${rain} mm/h`;
+    $("nowSeeing").textContent = `${seeing}/100`;
+    $("nowStatus").style.display = "flex";
+  }catch(e){ console.warn("NOW status update failed", e); }
+}
 
 async function fetchForecast(lat,lon){
   showSpinner(true);
@@ -626,26 +606,30 @@ async function fetchForecast(lat,lon){
   const d=await r.json();
   showSpinner(false);
   const {time,temperature_2m,cloudcover,precipitation,windspeed_10m}=d.hourly;
+
+  // Update topbar NOW status
+  updateNowStatusFromArrays(time, temperature_2m, cloudcover, precipitation, windspeed_10m);
+
   const div=$("forecast");div.innerHTML="";
   const days={};
   
-for(let i=0;i<time.length;i++){
-  let [date,hour] = time[i].split('T');
-  if(hour === '24:00'){
-    const dt = new Date(date + 'T00:00:00');
-    const next = new Date(dt.getTime() + 24*60*60*1000);
-    const y = next.getFullYear();
-    const m = String(next.getMonth()+1).padStart(2,'0');
-    const d2 = String(next.getDate()).padStart(2,'0');
-    date = `${y}-${m}-${d2}`;
-    hour = '00:00';
+  for(let i=0;i<time.length;i++){
+    let [date,hour] = time[i].split('T');
+    if(hour === '24:00'){
+      const dt = new Date(date + 'T00:00:00');
+      const next = new Date(dt.getTime() + 24*60*60*1000);
+      const y = next.getFullYear();
+      const m = String(next.getMonth()+1).padStart(2,'0');
+      const d2 = String(next.getDate()).padStart(2,'0');
+      date = `${y}-${m}-${d2}`;
+      hour = '00:00';
+    }
+    const entry={time:hour,temp:temperature_2m[i],cloud:cloudcover[i],rain:precipitation[i],wind:windspeed_10m[i],date};
+    if(!days[date]) days[date]=[];
+    if(time[i].startsWith(date+'T')){
+      days[date].push(entry);
+    }
   }
-  const entry={time:hour,temp:temperature_2m[i],cloud:cloudcover[i],rain:precipitation[i],wind:windspeed_10m[i],date};
-  if(!days[date]) days[date]=[];
-  if(time[i].startsWith(date+'T')){
-    days[date].push(entry);
-  }
-}
 
   let idx=0;
   Object.entries(days).sort((a,b)=> a[0]<b[0]? -1 : a[0]>b[0]? 1 : 0).forEach(([date,entries])=>{
@@ -665,6 +649,7 @@ for(let i=0;i<time.length;i++){
     const leftPart = document.createElement('div');
     leftPart.style.display='flex'; leftPart.style.alignItems='center'; leftPart.style.gap='8px';
     leftPart.innerHTML = `<span id="${contentId}-icon">⬆️</span> ${getDayName(date)}, ${date}
+      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); goToStart('${contentId}')">Ráno</button>
       <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '12:00')">Poledne</button>
       <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '23:00')">Půlnoc</button>
       <span class="tiny-help">(Kliknutím na den sbalíš/rozbalíš)</span>`;
@@ -724,8 +709,24 @@ for(let i=0;i<time.length;i++){
 }
 
 /* ===== Toggle & focus helpers ===== */
-function toggleForecast(id){const c=document.getElementById(id);const i=document.getElementById(id+'-icon');if(c.style.display==='none'){c.style.display='block';i.textContent='⬆️'}else{c.style.display='none';i.textContent='⬇️'}}
-function centerTime(contentId,target){const sc=document.querySelector(`#${contentId} .forecast-scroll`);if(!sc)return;const cards=sc.querySelectorAll('.forecast-card');for(let i=0;i<cards.length;i++){const strong=cards[i].querySelector('strong');if(strong&&strong.textContent.trim()===target){const w=sc.clientWidth;const off=cards[i].offsetLeft;const cw=cards[i].offsetWidth;sc.scrollTo({left:off-(w/2)+(cw/2),behavior:'smooth'});break}}}
+function toggleForecast(id){const c=document.getElementById(id);const i=$(id+'-icon');if(c.style.display==='none'){c.style.display='block';i.textContent='⬆️'}else{c.style.display='none';i.textContent='⬇️'}}
+function goToStart(contentId){const sc=document.querySelector(`#${contentId} .forecast-scroll`);if(!sc)return;sc.scrollTo({left:0,behavior:'smooth'});}
+function centerTime(contentId,target){
+  const sc=document.querySelector(`#${contentId} .forecast-scroll`); if(!sc) return;
+  const cards=sc.querySelectorAll('.forecast-card');
+  let found=false;
+  for(let i=0;i<cards.length;i++){
+    const strong=cards[i].querySelector('strong');
+    if(strong&&strong.textContent.trim()===target){
+      const w=sc.clientWidth;const off=cards[i].offsetLeft;const cw=cards[i].offsetWidth;
+      sc.scrollTo({left:off-(w/2)+(cw/2),behavior:'smooth'});
+      found=true;break;
+    }
+  }
+  if(!found){ // pokud konkrétní hodina chybí (třeba u dneška), vrať na začátek
+    goToStart(contentId);
+  }
+}
 
 /* Change graph mode for a given day */
 function changeGraphMode(contentId, mode){
@@ -787,6 +788,162 @@ async function fetchPlanets(lat,lon){
 }
 
 window.addEventListener('load', syncMapHeight);
+
+/* ===== RainViewer overlays: radar + IR clouds ===== */
+let rvState = {
+  host: 'https://tilecache.rainviewer.com',
+  radarPath: null,
+  satPath: null,
+  radarLayer: null,
+  satLayer: null,
+  control: null,
+  lastTsRadar: 0,
+  lastTsSat: 0
+};
+
+async function loadRainviewerMeta(){
+  try{
+    const res = await fetch('https://api.rainviewer.com/public/weather-maps.json', { cache: 'no-store' });
+    const data = await res.json();
+    rvState.host = data.host || rvState.host;
+
+    // latest radar: prefer nowcast if available, else last past
+    let radarFrames = (data.radar?.nowcast && data.radar.nowcast.length ? data.radar.nowcast : data.radar?.past) || [];
+    if(radarFrames.length){
+      const last = radarFrames[radarFrames.length - 1];
+      rvState.radarPath = last.path;
+      rvState.lastTsRadar = last.time;
+    }
+
+    // latest satellite IR (clouds)
+    const satFrames = (data.satellite?.infrared) || [];
+    if(satFrames.length){
+      const last = satFrames[satFrames.length - 1];
+      rvState.satPath = last.path;
+      rvState.lastTsSat = last.time;
+    }
+  }catch(e){
+    console.warn('RainViewer meta fetch failed', e);
+  }
+}
+
+function ensureRvLayers(){
+  if(!map) return;
+  // create/update radar layer
+  if(rvState.radarPath){
+    const url = `${rvState.host}${rvState.radarPath}/256/{z}/{x}/{y}/2/1_1.png`;
+    if(rvState.radarLayer){
+      rvState.radarLayer.setUrl(url);
+    } else {
+      rvState.radarLayer = L.tileLayer(url, { opacity: 0.65, zIndex: 450, attribution: 'Radar © RainViewer' });
+    }
+  }
+  // create/update satellite IR layer (clouds)
+  if(rvState.satPath){
+    const urlSat = `${rvState.host}${rvState.satPath}/256/{z}/{x}/{y}/0/0_0.png`; // satellite requires color=0 and options 0_0
+    if(rvState.satLayer){
+      rvState.satLayer.setUrl(urlSat);
+    } else {
+      rvState.satLayer = L.tileLayer(urlSat, { opacity: 0.5, zIndex: 440, attribution: 'Satellite © RainViewer' });
+    }
+  }
+
+  // add layer control once
+  if(!rvState.control){
+    const overlays = {};
+    if(rvState.satLayer) overlays['☁️ Oblačnost (IR)'] = rvState.satLayer;
+    if(rvState.radarLayer) overlays['🌧️ Srážkový radar'] = rvState.radarLayer;
+    rvState.control = L.control.layers({}, overlays, { collapsed: false, position: 'topleft' }).addTo(map);
+  } else {
+    // update existing control (Leaflet has no direct API to refresh; simple approach: remove/add control)
+    map.removeControl(rvState.control);
+    const overlays = {};
+    if(rvState.satLayer) overlays['☁️ Oblačnost (IR)'] = rvState.satLayer;
+    if(rvState.radarLayer) overlays['🌧️ Srážkový radar'] = rvState.radarLayer;
+    rvState.control = L.control.layers({}, overlays, { collapsed: false, position: 'topleft' }).addTo(map);
+  }
+}
+
+async function refreshWeatherLayers(){
+  const prevRadar = rvState.lastTsRadar;
+  const prevSat = rvState.lastTsSat;
+  await loadRainviewerMeta();
+  if(rvState.lastTsRadar && rvState.lastTsRadar !== prevRadar){
+    ensureRvLayers();
+  }
+  if(rvState.lastTsSat && rvState.lastTsSat !== prevSat){
+    ensureRvLayers();
+  }
+}
+
+async function enableWeatherLayers(){
+  await loadRainviewerMeta();
+  ensureRvLayers();
+}
+
+// refresh every 10 minutes
+setInterval(()=>{
+  refreshWeatherLayers();
+}, 10*60*1000);
+
+
+
+/* ===== Diagnostics (minimal) ===== */
+const diagList = document.getElementById('diagList');
+function el(tag, attrs={}, html=""){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v);
+  if(html) e.innerHTML=html;
+  return e;
+}
+function statusRow(name, statusClass, text){
+  const row = el('div', {class:'diag-item'});
+  row.appendChild(el('div',{class:'diag-name'}, name));
+  row.appendChild(el('div',{class:'diag-status '+statusClass}, text));
+  return row;
+}
+async function ping(url, timeout=4500){
+  const controller = new AbortController();
+  const id = setTimeout(()=>controller.abort(), timeout);
+  try{
+    const r = await fetch(url, {signal: controller.signal, method:'GET'});
+    clearTimeout(id);
+    return {ok:r.ok, status:r.status};
+  }catch(e){
+    clearTimeout(id);
+    return {ok:false, status:'—'};
+  }
+}
+async function runDiagnostics(){
+  if(!diagList) return;
+  diagList.innerHTML = "";
+  const endpoints = [
+    { name: "Open-Meteo Forecast", url: "https://api.open-meteo.com/v1/forecast?latitude=50.08&longitude=14.44&hourly=temperature_2m&timezone=Europe%2FPrague" },
+    { name: "ipgeolocation Astronomy", url: `https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=50.08&long=14.44` },
+    { name: "Nominatim Reverse", url: "https://nominatim.openstreetmap.org/reverse?format=json&lat=50.08&lon=14.44&zoom=10&addressdetails=1" }
+  ];
+  for(const ep of endpoints){
+    const row = statusRow(ep.name, 'pending', 'čekám…');
+    diagList.appendChild(row);
+    ping(ep.url).then(res=>{
+      const s = row.querySelector('.diag-status');
+      if(res.ok){ s.className='diag-status ok'; s.textContent='OK '+res.status; }
+      else { s.className='diag-status fail'; s.textContent='Chyba '+res.status; }
+    });
+  }
+}
+function openDiagModal(){
+  const overlay = document.getElementById('diagOverlay');
+  if(overlay){ overlay.style.display='flex'; runDiagnostics(); }
+}
+function closeDiagModal(){
+  const overlay = document.getElementById('diagOverlay');
+  if(overlay){ overlay.style.display='none'; }
+}
+document.getElementById('openDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); openDiagModal(); });
+document.getElementById('closeDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); closeDiagModal(); });
+document.getElementById('rerunDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); runDiagnostics(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDiagModal(); } });
 </script>
 </body>
 </html>
