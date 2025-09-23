@@ -150,6 +150,60 @@
   .footer{text-align:center;opacity:.8;margin-top:10px;font-size:.95em}
   .small{font-size:.92em;opacity:.9}
   .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#243442;border:1px solid var(--border);margin:4px 6px 0 0}
+
+  /* Globální přepínače v topbaru – skryté do vyhledání lokace */
+  .global-mode-tabs{ display:none; }
+  .global-mode-tabs.shown{ display:flex; }
+
+</style>
+
+<style>
+/* === Mobile-first vylepšení (≤ 768px) === */
+@media (max-width: 768px){
+  :root{
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  body{ padding:8px; padding-bottom: calc(12px + var(--safe-bottom)); }
+  h1{ font-size:1.5rem; margin:6px 0 10px; }
+
+  .topbar{
+    padding:6px 8px;
+    padding-top: calc(6px + var(--safe-top));
+    gap:6px;
+    grid-template-columns:auto 1fr auto;
+  }
+  .now-status{
+    flex-wrap:wrap;
+    row-gap:4px;
+    font-size:.95em;
+  }
+
+  .controls{ gap:6px; }
+  #cityInput{
+    width:100%;
+    font-size:16px;           /* iOS no-zoom */
+    padding:12px 38px 12px 12px;
+  }
+  #suggestions{ max-height:50vh; overflow:auto; }
+
+  .top-row{ grid-template-columns: 1fr; }
+  .panel{ padding:12px; }
+
+  /* Fixní výška mapy na mobilu */
+  #mapPanel{ height:48vh !important; }
+  #map{ height:48vh !important; }
+
+  .forecast-scroll{
+    -webkit-overflow-scrolling: touch;
+    padding-bottom:10px;
+  }
+  .forecast-card{ min-width:96px; padding:8px; }
+  .scroll-left, .scroll-right{ display:none; }
+
+  .mode-tabs{ flex-wrap:wrap; }
+}
 </style>
 </head>
 <body>
@@ -202,8 +256,13 @@
         <span>🌡️ <span class="val" id="nowTemp">—</span></span>
       </div>
 
-      <!-- Pravá (třetí) buňka gridu prázdná pro symetrii -->
-      <div></div>
+      
+<div id="globalModeTabs" class="global-mode-tabs" style="gap:6px;align-items:center;">
+  <button class="mode-btn" data-mode="seeing" onclick="changeAllGraphModes('seeing')">👁️</button>
+  <button class="mode-btn" data-mode="wind" onclick="changeAllGraphModes('wind')">💨</button>
+  <button class="mode-btn" data-mode="rain" onclick="changeAllGraphModes('rain')">🌧️</button>
+</div>
+
     </div>
 
     <h1>🪐 Astronomická předpověď</h1>
@@ -323,7 +382,7 @@ window.addEventListener("resize", syncMapHeight);
 
 /* ===== Geocoding & selection ===== */
 let selectedCity=null;
-async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);fetchPlanets(c.latitude,c.longitude);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
+async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);fetchPlanets(c.latitude,c.longitude);showGlobalTabs(true);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
 
 async function getLocation(){
   if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");
@@ -336,7 +395,7 @@ async function getLocation(){
     initMap(lat,lon);
     fetchForecast(lat,lon);
     fetchMoonPhase(lat,lon);
-    fetchPlanets(lat,lon);
+    fetchPlanets(lat,lon);showGlobalTabs(true);
     /* NOVĚ: po kliknutí na Moje poloha vyčistit vstup i návrhy */
     const input=$("cityInput"); if(input) input.value="";
     const s=$("suggestions"); if(s) { s.innerHTML=""; s.style.display="none"; }
@@ -944,6 +1003,74 @@ document.getElementById('openDiag')?.addEventListener('click', (e)=>{ e.preventD
 document.getElementById('closeDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); closeDiagModal(); });
 document.getElementById('rerunDiag')?.addEventListener('click', (e)=>{ e.preventDefault(); runDiagnostics(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDiagModal(); } });
+
+/* ===== Globální přepínače: zobrazit až po volbě lokace ===== */
+function showGlobalTabs(flag){
+  const box = document.getElementById('globalModeTabs');
+  if(!box) return;
+  if(flag){
+    // Nastav aktivní tlačítko podle prvního dne (pokud existuje), jinak default 'seeing'
+    let mode = 'seeing';
+    try{
+      const firstId = Object.keys(window._graphMode||{})[0];
+      if(firstId && window._graphMode[firstId]) mode = window._graphMode[firstId];
+    }catch(e){}
+    box.classList.add('shown');
+    box.querySelectorAll('.mode-btn').forEach(b=>{
+      b.classList.toggle('active', b.getAttribute('data-mode')===mode);
+    });
+  }else{
+    box.classList.remove('shown');
+  }
+}
+
+
+/* ===== Global mode change ===== */
+function changeAllGraphModes(mode){
+  // zvýraznění globálních tlačítek
+  document.querySelectorAll('.global-mode-tabs .mode-btn').forEach(b=>{
+    b.classList.toggle('active', b.getAttribute('data-mode')===mode);
+  });
+  // změna všech dnů
+  Object.keys(window._graphData).forEach(contentId=>{
+    changeGraphMode(contentId, mode);
+    // zároveň změnit zvýraznění v každém dni
+    const tabs=document.querySelector(`#${contentId}`).parentElement.querySelector('.mode-tabs');
+    if(tabs){
+      tabs.querySelectorAll('.mode-btn').forEach(b=>{
+        b.classList.toggle('active', b.getAttribute('data-mode')===mode);
+      });
+    }
+  });
+}
+
+</script>
+
+<script>
+(function(){
+  function isSmall(){ return window.matchMedia('(max-width: 768px)').matches; }
+  function fixMapMobileHeight(){
+    var mapPanel=document.getElementById("mapPanel");
+    var mapDiv=document.getElementById("map");
+    if(!mapPanel||!mapDiv) return;
+    var vh = Math.max(320, Math.round(window.innerHeight * 0.48));
+    mapPanel.style.setProperty('height', vh + 'px', 'important');
+    mapDiv.style.setProperty('height', vh + 'px', 'important');
+    if(window._leafletMap){ setTimeout(function(){ window._leafletMap.invalidateSize(); }, 100); }
+  }
+  // Monkey-patch: keep original for desktop; override behavior only on mobile
+  var orig = window.syncMapHeight;
+  window.syncMapHeight = function(){
+    if(isSmall()){
+      fixMapMobileHeight();
+      return; // skip desktop sync
+    }
+    if(typeof orig === 'function'){ return orig.apply(this, arguments); }
+  };
+  // Apply once on load + on orientation change
+  window.addEventListener('load', function(){ if(isSmall()) fixMapMobileHeight(); });
+  window.addEventListener('orientationchange', function(){ setTimeout(function(){ if(isSmall()) fixMapMobileHeight(); }, 250); });
+})();
 </script>
 </body>
 </html>
