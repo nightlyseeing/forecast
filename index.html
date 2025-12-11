@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/astronomy.min.js"></script>
+<script src="https://unpkg.com/suncalc@1.9.0/suncalc.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
@@ -124,11 +124,20 @@
 
   #mapPanel{padding:0;overflow:hidden;position:relative; z-index:1}
   #map{width:100%;height:100%}
+  
+  /* === Přesunutí a zmenšení kontrolu vrstev (o 30% dolů/doprava) === */
+  .leaflet-control-container .leaflet-control-layers {
+    transform: scale(0.7);
+    transform-origin: bottom right; 
+    margin-right: 8px; 
+    margin-bottom: 8px; 
+  }
+  
   .zoom-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:4px 8px;border-radius:999px;font-size:.85em;border:1px solid rgba(255,255,255,.2);z-index:2}
   .map-tip{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;padding:6px 8px;border-radius:8px;font-size:.9em;border:1px solid rgba(255,255,255,.2);z-index:2}
 
   .forecast-day{border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative}
-  .forecast-day h3{margin:0;padding:10px;background:#4b3f72;color:#fff;display:flex;align-items:center;gap:8px;cursor:pointer;position:relative;z-index:2;flex-wrap:wrap}
+  .forecast-day h3{margin:0;padding:10px;background:#4b3f72;color:#fff;display:flex;align-items:center;gap:8px;cursor:default;position:relative;z-index:2;flex-wrap:wrap}
   .mode-tabs{display:flex; gap:6px; margin-left:auto}
   .mode-btn{
     background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);
@@ -155,6 +164,107 @@
   .global-mode-tabs{ display:none; }
   .global-mode-tabs.shown{ display:flex; }
 
+
+  /* === Astro widget (Slunce / Měsíc) === */
+  .astro-widget{
+    margin-top:10px;
+  }
+  .astro-widget-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .astro-card{
+    flex:1 1 160px;
+    background:radial-gradient(circle at top, #111827 0%, #020617 70%);
+    border-radius:12px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 0 14px rgba(0,0,0,.7);
+  }
+  .astro-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .astro-card-title{
+    font-size:.8rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .astro-info-icon{
+    width:18px;height:18px;border-radius:999px;
+    border:1px solid rgba(255,255,255,0.35);
+    display:flex;align-items:center;justify-content:center;
+    font-size:.7rem;opacity:.7;
+  }
+  .astro-arc-wrapper{
+    margin-top:6px;
+    margin-bottom:4px;
+  }
+  .astro-arc-wrapper svg{
+    width:100%;
+    height:90px;
+  }
+  .astro-baseline{
+    stroke:rgba(255,255,255,0.35);
+    stroke-width:1.2;
+  }
+  .astro-sun-above{
+    fill:none;
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke:#fbbf24;
+  }
+  .astro-sun-below{
+    fill:none;
+    stroke-width:1.6;
+    stroke-linecap:round;
+    stroke:rgba(248,250,252,0.25);
+  }
+  .astro-moon-above{
+    fill:none;
+    stroke-width:2.2;
+    stroke-linecap:round;
+    stroke:#cbd5f5;
+  }
+  .astro-moon-below{
+    fill:none;
+    stroke-width:1.6;
+    stroke-linecap:round;
+    stroke:rgba(148,163,184,0.4);
+  }
+  .astro-sun-dot{
+    fill:#fde68a;
+    stroke:#fbbf24;
+    stroke-width:2;
+    filter:drop-shadow(0 0 8px rgba(251,191,36,0.9));
+  }
+  .astro-moon-dot{
+    fill:#e5e7eb;
+    stroke:#9ca3af;
+    stroke-width:2;
+    filter:drop-shadow(0 0 6px rgba(148,163,184,0.9));
+  }
+  .astro-times{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    font-size:.78rem;
+    color:#e5e7eb;
+  }
+  .astro-times strong{
+    color:var(--accent);
+  }
+  .astro-alt{
+    margin-top:2px;
+    font-size:.72rem;
+    color:#9ca3af;
+    text-align:right;
+  }
 </style>
 
 <style>
@@ -209,10 +319,8 @@
 <body>
 
 <div class="layout">
-  <!-- Left ad gutter -->
   <aside class="ad-slot">Rezervováno pro levý banner (220px)</aside>
 
-  <!-- Main column -->
   <main>
     <div class="topbar">
       <div class="menu-container">
@@ -233,7 +341,6 @@
               </div>
             </div>
           </div>
-          <!-- NOVĚ: Verze v menu s hover zobrazením -->
           <div class="menu-section">
             <div class="menu-item has-submenu">ℹ️ Verze ▸
               <div class="submenu">
@@ -244,7 +351,6 @@
         </div>
       </div>
 
-      <!-- Prostřední (center) buňka gridu: NOW status -->
       <div id="nowStatus" class="now-status" style="display:none">
         <span class="place" id="nowPlace">—</span><span class="sep">|</span>
         <span>👁️ <span class="val" id="nowSeeing">—</span></span>
@@ -282,23 +388,74 @@
           <div class="kv" style="margin-top:8px;">
             <span><strong>Název:</strong></span><span id="info-name">—</span>
             <span><strong>GPS:</strong></span><span id="info-gps">—</span>
+            <span><strong>Místní čas:</strong></span><span id="info-localtime">—</span>
             <span><strong>Mapa LP:</strong></span><span><a id="bortle-link" href="#" target="_blank" style="display:none;color:#00ffc3;text-decoration:underline;font-weight:bold;">Zobrazit Bortle</a></span>
           </div>
         </div>
 
         <div class="panel">
           <strong>🔭 Astronomické informace</strong>
+
           <div style="margin-top:8px;">
-            <div><strong>🌙 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
+            <div><strong>🌕 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
           </div>
-          <div style="margin-top:12px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <strong>🪐 Viditelné planety ~22:00</strong>
-              <span id="planet-log" class="small" style="opacity:.85;"></span>
+
+          <!-- NOVÝ WIDGET: Slunce & Měsíc -->
+          <div class="astro-widget">
+            <div class="astro-widget-row">
+
+              <!-- SLUNCE -->
+              <div class="astro-card">
+                <div class="astro-card-header">
+                  <span class="astro-card-title">SLUNCE</span>
+                  <span class="astro-info-icon">i</span>
+                </div>
+                <div class="astro-arc-wrapper">
+                  <svg viewBox="0 0 300 90">
+                    <line x1="20" y1="45" x2="280" y2="45" class="astro-baseline"></line>
+
+                    <path id="sun-path-above" class="astro-sun-above" d=""></path>
+                    <path id="sun-path-below" class="astro-sun-below" d=""></path>
+
+                    <!-- větší Slunce -->
+                    <circle id="sun-dot" class="astro-sun-dot" r="10" cx="20" cy="45"></circle>
+                  </svg>
+                </div>
+                <div class="astro-times">
+                  <span>Východ: <strong id="sun-rise-label">—</strong></span>
+                  <span>Západ: <strong id="sun-set-label">—</strong></span>
+                </div>
+                <div class="astro-alt" id="sun-alt-label">Výška: —</div>
+              </div>
+
+              <!-- MĚSÍC -->
+              <div class="astro-card">
+                <div class="astro-card-header">
+                  <span class="astro-card-title">MĚSÍC</span>
+                  <span class="astro-info-icon">i</span>
+                </div>
+                <div class="astro-arc-wrapper">
+                  <svg viewBox="0 0 300 90">
+                    <line x1="20" y1="45" x2="280" y2="45" class="astro-baseline"></line>
+
+                    <path id="moon-path-above" class="astro-moon-above" d=""></path>
+                    <path id="moon-path-below" class="astro-moon-below" d=""></path>
+
+                    <!-- větší Měsíc -->
+                    <circle id="moon-dot" class="astro-moon-dot" r="9" cx="20" cy="45"></circle>
+                  </svg>
+                </div>
+                <div class="astro-times">
+                  <span>Východ: <strong id="moon-rise-label">—</strong></span>
+                  <span>Západ: <strong id="moon-set-label">—</strong></span>
+                </div>
+                <div class="astro-alt" id="moon-alt-label">Výška: —</div>
+              </div>
+
             </div>
-            <div id="planets-list"></div>
           </div>
-        </div>
+
+                  </div>
       </div>
 
       <div class="right-col">
@@ -314,15 +471,13 @@
     <div id="forecast" style="margin-top:8px;"></div>
 
     <div class="footer">
-      Zdroj fází: ipgeolocation.io • Počasí a geokódování: Open-Meteo • Planety: Astronomy Engine (fallback ipgeolocation) • Mapa: Leaflet & OSM
+      Zdroj fází: ipgeolocation.io • Počasí a geokódování: Open-Meteo • Mapa: Leaflet & OSM/Esri
     </div>
   </main>
 
-  <!-- Right ad gutter -->
   <aside class="ad-slot">Rezervováno pro pravý banner (220px)</aside>
 </div>
 
-<!-- Diagnostics modal -->
 <div class="modal-overlay" id="diagOverlay" role="dialog" aria-modal="true" aria-labelledby="diagTitle">
   <div class="modal">
     <header>
@@ -339,8 +494,7 @@
 
 <script>
 const IPGEO_API_KEY="781aa2d69af74745906e01cc68c84207";
-const VERSION = "v0.3.8";
-
+const VERSION = "v 0.1"; // <--- ZMĚNA
 /* ===== Menu ===== */
 function toggleMenu(){const m=document.getElementById("mainMenu");m.style.display=m.style.display==="block"?"none":"block"}
 document.addEventListener("click",(e)=>{const m=document.getElementById("mainMenu");const t=document.querySelector(".menu-toggle");if(m&&t&&!m.contains(e.target)&&!t.contains(e.target))m.style.display="none"});
@@ -382,7 +536,7 @@ window.addEventListener("resize", syncMapHeight);
 
 /* ===== Geocoding & selection ===== */
 let selectedCity=null;
-async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);fetchPlanets(c.latitude,c.longitude);showGlobalTabs(true);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
+async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);showGlobalTabs(true);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
 
 async function getLocation(){
   if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");
@@ -395,7 +549,7 @@ async function getLocation(){
     initMap(lat,lon);
     fetchForecast(lat,lon);
     fetchMoonPhase(lat,lon);
-    fetchPlanets(lat,lon);showGlobalTabs(true);
+    showGlobalTabs(true);
     /* NOVĚ: po kliknutí na Moje poloha vyčistit vstup i návrhy */
     const input=$("cityInput"); if(input) input.value="";
     const s=$("suggestions"); if(s) { s.innerHTML=""; s.style.display="none"; }
@@ -406,24 +560,81 @@ async function reverseGeocode(lat,lon){try{const r=await fetch(`https://nominati
 
 function updateLocationInfo(c){const name=c.name||"-";const country=c.country||"";const lat=typeof c.latitude==="number"?c.latitude:null;const lon=typeof c.longitude==="number"?c.longitude:null;$("info-name").innerHTML=country?`<span style="color:#00ffc3;font-weight:bold;">${name}</span>, ${country}`:`<span style="color:#00ffc3;font-weight:bold;">${name}</span>`;$("info-gps").textContent=(lat!=null&&lon!=null)?`${lat.toFixed(4)}, ${lon.toFixed(4)}`:"—";const link=$("bortle-link");if(lat!=null&&lon!=null){link.href=`https://www.lightpollutionmap.info/#zoom=9&lat=${lat}&lon=${lon}`;link.style.display="inline"}else{link.style.display="none"};const np=$("nowPlace");if(np){np.textContent = name || "—";}}
 
+/* === NOVÉ: Map Layers Definition === */
+
+// Standard OpenStreetMap layer
+const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© OpenStreetMap'
+});
+
+// Esri World Imagery (Satellite) layer
+const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19,
+  attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+});
+
 /* ===== Map on the right ===== */
-let map=null,marker=null,zoomEnabled=false,zoomControl=null;
+let map=null,marker=null,zoomEnabled=false; // <--- ODSTRANĚNÍ: zoomControl
+
+// Funkce pro přidání/aktualizaci Leaflet Layer Control
+function addLayerControl() {
+  if (!map) return;
+
+  // 1. Základní mapy pro přepínání
+  const baseMaps = {
+    "🗺️ Standardní mapa": osmStandard,
+    "🛰️ Satelitní snímky (Esri)": esriSat
+  };
+
+  // 2. Překryvné vrstvy (RainViewer)
+  const overlays = {};
+  if (rvState.satLayer) overlays['☁️ Oblačnost (IR)'] = rvState.satLayer;
+  if (rvState.radarLayer) overlays['🌧️ Srážkový radar'] = rvState.radarLayer;
+
+  // Odstranění stávajícího kontrolu, pokud existuje
+  if (rvState.control) {
+    map.removeControl(rvState.control);
+  }
+
+  // 3. Přidání nového kontrolu a zajištění, že je aktivní výchozí mapa
+  rvState.control = L.control.layers(baseMaps, overlays, { 
+    collapsed: false, 
+    position: 'bottomright' // <-- Přesunuto do pravého dolního rohu
+  }).addTo(map);
+
+  // Zajištění, že je aktivní alespoň jedna základní vrstva (výchozí OSM)
+  if (!map.hasLayer(osmStandard) && !map.hasLayer(esriSat)) {
+    osmStandard.addTo(map);
+  }
+}
+
 function initMap(lat,lon){
   syncMapHeight();
   if(!map){
-    map=window._leafletMap = L.map('map', { zoomControl:false, scrollWheelZoom:false, touchZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, dragging:true }).setView([lat,lon],10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    map=window._leafletMap = L.map('map', { 
+      zoomControl:true, // <--- ZMĚNA: Zapnutí tlačítek + a - (Leaflet default)
+      scrollWheelZoom:false, 
+      touchZoom:false, 
+      doubleClickZoom:false, 
+      boxZoom:false, 
+      keyboard:false, 
+      dragging:true 
+    }).setView([lat,lon],10);
+    
+    // Zde již nepřidáváme jednu mapovou vrstvu, spravuje to addLayerControl
+    
     marker=L.marker([lat,lon]).addTo(map);
     map.on('contextmenu', function(){
       zoomEnabled = !zoomEnabled;
       const badge = $("mapZoomBadge");
       if(zoomEnabled){
         map.scrollWheelZoom.enable(); map.touchZoom.enable(); map.doubleClickZoom.enable(); map.boxZoom.enable(); map.keyboard.enable();
-        if(!zoomControl){ zoomControl = L.control.zoom({position:'topleft'}).addTo(map); }
+        // zoomControl už není manuálně spravován, je trvale zapnut v L.map
         if(badge) badge.textContent = "Zoom: zapnuto";
       } else {
         map.scrollWheelZoom.disable(); map.touchZoom.disable(); map.doubleClickZoom.disable(); map.boxZoom.disable(); map.keyboard.disable();
-        if(zoomControl){ map.removeControl(zoomControl); zoomControl=null; }
+        // zoomControl už není manuálně spravován, je trvale zapnut v L.map
         if(badge) badge.textContent = "Zoom: vypnuto";
       }
     });
@@ -431,29 +642,202 @@ function initMap(lat,lon){
     map.setView([lat,lon], 10);
     marker.setLatLng([lat,lon]);
   }
-  // initialize RainViewer overlays once when map is ready
+  
+  // Přidání kontroly vrstev hned po inicializaci mapy
+  addLayerControl();
+  
+  // inicializace RainViewer překryvů
   enableWeatherLayers();
   setTimeout(()=> { map.invalidateSize(); syncMapHeight(); }, 150);
 }
 
-/* ===== Moon phase (ipgeolocation only) ===== */
+/* ===== Moon phase & Sun/Moon times (ipgeolocation only) ===== */
 let moonIllumByDate = {};
 function getMoonEmojiFromName(n){n=String(n||"").toLowerCase().replace(/_/g," ").trim();if(n.includes("new moon"))return"🌑 Nov";if(n.includes("waxing crescent"))return"🌒 Dorůstající srpek";if(n.includes("first quarter"))return"🌓 První čtvrť";if(n.includes("waxing gibbous"))return"🌔 Dorůstající měsíc";if(n.includes("full moon"))return"🌕 Úplněk";if(n.includes("waning gibbous"))return"🌖 Couvající měsíc";if(n.includes("last quarter"))return"🌗 Poslední čtvrť";if(n.includes("waning crescent"))return"🌘 Couvající srpek";return"🌙 Neznámá fáze"}
+
+/* ===== Astro widget: Slunce & Měsíc (SunCalc) ===== */
+const astroState = {
+  lat: 50.0755,
+  lon: 14.4378
+};
+
+const sunDotEl       = document.getElementById("sun-dot");
+const moonDotEl      = document.getElementById("moon-dot");
+const sunPathAboveEl = document.getElementById("sun-path-above");
+const sunPathBelowEl = document.getElementById("sun-path-below");
+const moonPathAboveEl= document.getElementById("moon-path-above");
+const moonPathBelowEl= document.getElementById("moon-path-below");
+const sunAltLabel    = document.getElementById("sun-alt-label");
+const moonAltLabel   = document.getElementById("moon-alt-label");
+
+const ASTRO_MIN_X = 20;
+const ASTRO_MAX_X = 280;
+const ASTRO_BASELINE_Y = 45;
+const ASTRO_AMPLITUDE  = 32;
+const ASTRO_MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function astroDayFraction(date){
+  const midnight = new Date(date);
+  midnight.setHours(0,0,0,0);
+  return (date - midnight) / ASTRO_MS_PER_DAY;
+}
+
+// pro Měsíc – půlnoc doprostřed
+function astroNightFractionCentered(date){
+  const midnight = new Date(date);
+  midnight.setHours(0,0,0,0);
+  const msFromMidnight = date - midnight;
+  const shifted = (msFromMidnight + ASTRO_MS_PER_DAY/2) % ASTRO_MS_PER_DAY;
+  return shifted / ASTRO_MS_PER_DAY; // 0.5 = půlnoc
+}
+
+function astroAltitudeToPoint(t, altitude){
+  const altClamped = Math.max(-Math.PI/2, Math.min(Math.PI/2, altitude));
+  const x = ASTRO_MIN_X + t * (ASTRO_MAX_X - ASTRO_MIN_X);
+  const y = ASTRO_BASELINE_Y - (altClamped / (Math.PI/2)) * ASTRO_AMPLITUDE;
+  return { x, y };
+}
+
+function astroFormatDegrees(rad){
+  const deg = rad * 180 / Math.PI;
+  return deg.toFixed(1).replace(".", ",") + "°";
+}
+
+function astroBuildCurve(body, pathAboveEl, pathBelowEl, lat, lon){
+  if(!window.SunCalc || !pathAboveEl || !pathBelowEl) return;
+
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(0,0,0,0);
+
+  const steps = 120;
+  let pathAbove = "";
+  let pathBelow = "";
+  let lastAbove = null;
+
+  for(let i = 0; i <= steps; i++){
+    const frac = i / steps;
+    const time = new Date(midnight.getTime() + frac * ASTRO_MS_PER_DAY);
+
+    let altitude;
+    let t;
+
+    if(body === "sun"){
+      // Slunce – osa X jde normálně od půlnoci do půlnoci
+      const pos = SunCalc.getPosition(time, lat, lon);
+      altitude = pos.altitude;
+      t = frac;
+    } else {
+      // Měsíc – používáme stejnou časovou osu jako pro Slunce,
+      // bez posunu a bez skoků v X souřadnici
+      const pos = SunCalc.getMoonPosition(time, lat, lon);
+      altitude = pos.altitude;
+      t = frac;
+    }
+
+    const point = astroAltitudeToPoint(t, altitude);
+    const above = altitude >= 0;
+
+    if(above){
+      if(lastAbove !== true){
+        pathAbove += ` M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      } else {
+        pathAbove += ` L ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      }
+    } else {
+      if(lastAbove !== false){
+        pathBelow += ` M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      } else {
+        pathBelow += ` L ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      }
+    }
+
+    lastAbove = above;
+  }
+
+  pathAboveEl.setAttribute("d", pathAbove.trim());
+  pathBelowEl.setAttribute("d", pathBelow.trim());
+}
+
+
+function updateAstroWidget(){
+  if(!window.SunCalc || !sunDotEl || !moonDotEl) return;
+
+  const now = new Date();
+  const { lat, lon } = astroState;
+
+  const tNowSun  = astroDayFraction(now);
+  const tNowMoon = astroDayFraction(now);
+
+  // SLUNCE
+  astroBuildCurve("sun", sunPathAboveEl, sunPathBelowEl, lat, lon);
+  const sunPos = SunCalc.getPosition(now, lat, lon);
+  const sunPointNow = astroAltitudeToPoint(tNowSun, sunPos.altitude);
+  sunDotEl.setAttribute("cx", sunPointNow.x);
+  sunDotEl.setAttribute("cy", sunPointNow.y - 1);
+  if(sunAltLabel){
+    sunAltLabel.textContent = "Výška: " + astroFormatDegrees(sunPos.altitude);
+  }
+
+  // MĚSÍC
+  astroBuildCurve("moon", moonPathAboveEl, moonPathBelowEl, lat, lon);
+  const moonPos = SunCalc.getMoonPosition(now, lat, lon);
+  const moonPointNow = astroAltitudeToPoint(tNowMoon, moonPos.altitude);
+  moonDotEl.setAttribute("cx", moonPointNow.x);
+  moonDotEl.setAttribute("cy", moonPointNow.y - 1);
+  if(moonAltLabel){
+    moonAltLabel.textContent = "Výška: " + astroFormatDegrees(moonPos.altitude);
+  }
+}
+
+function updateAstroLocation(lat, lon){
+  astroState.lat = lat;
+  astroState.lon = lon;
+  updateAstroWidget();
+}
+
+// první vykreslení + pravidelná aktualizace
+updateAstroWidget();
+setInterval(updateAstroWidget, 60*1000);
+
+
 async function fetchMoonPhase(lat,lon){
+  // napojení astro widgetu na stejné souřadnice
+  updateAstroLocation(lat, lon);
+
   const url=`https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=${lat}&long=${lon}`;
   try{
     const r=await fetch(url);
     const d=await r.json();
+
+    // Moon Phase
     const p=d.moon_phase||"Neznámá fáze";
     $("moon-phase-label").textContent=getMoonEmojiFromName(p);
+
+    // Sun Times (Sunrise/Sunset)
+    const sunRise = d.sunrise ? d.sunrise.substring(0, 5) : '—';
+    const sunSet = d.sunset ? d.sunset.substring(0, 5) : '—';
+    $("sun-rise-label").textContent = sunRise;
+    $("sun-set-label").textContent = sunSet;
+
+    // Moon Times (Moonrise/Moonset)
+    const moonRise = (d.moonrise && d.moonrise !== '00:00') ? d.moonrise.substring(0, 5) : 'N/A';
+    const moonSet = (d.moonset && d.moonset !== '00:00') ? d.moonset.substring(0, 5) : 'N/A';
+    $("moon-rise-label").textContent = moonRise;
+    $("moon-set-label").textContent = moonSet;
+
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Prague' });
     const illumPct = Number(d.moon_illumination);
     if(Number.isFinite(illumPct)){
       moonIllumByDate[today] = Math.max(0, Math.min(1, illumPct/100));
     }
   }catch(e){
-    console.error("Chyba při načítání fáze:",e);
+    console.error("Chyba při načítání fáze/slunce/měsíce:",e);
     $("moon-phase-label").textContent="Chyba načítání";
+    $("sun-rise-label").textContent = "—";
+    $("sun-set-label").textContent = "—";
+    $("moon-rise-label").textContent = "—";
+    $("moon-set-label").textContent = "—";
   }
 }
 
@@ -661,8 +1045,24 @@ function updateNowStatusFromArrays(timeArr, tempArr, cloudArr, rainArr, windArr)
 
 async function fetchForecast(lat,lon){
   showSpinner(true);
-  const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=Europe/Prague`);
+  const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,cloudcover,precipitation,windspeed_10m&timezone=auto`);
   const d=await r.json();
+  // Update local time for selected location (using Open-Meteo timezone info)
+  try {
+    const tzName = d.timezone || "";
+    const offsetSeconds = typeof d.utc_offset_seconds === "number" ? d.utc_offset_seconds : 0;
+    const nowUtc = new Date();
+    const localTime = new Date(nowUtc.getTime() + offsetSeconds * 1000);
+    const ltEl = document.getElementById("info-localtime");
+    if (ltEl) {
+      const timeStr = localTime.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
+      ltEl.textContent = tzName ? `${timeStr} (${tzName})` : timeStr;
+    }
+  } catch (e) {
+    const ltEl = document.getElementById("info-localtime");
+    if (ltEl) ltEl.textContent = "—";
+  }
+
   showSpinner(false);
   const {time,temperature_2m,cloudcover,precipitation,windspeed_10m}=d.hourly;
 
@@ -707,11 +1107,10 @@ async function fetchForecast(lat,lon){
 
     const leftPart = document.createElement('div');
     leftPart.style.display='flex'; leftPart.style.alignItems='center'; leftPart.style.gap='8px';
-    leftPart.innerHTML = `<span id="${contentId}-icon">⬆️</span> ${getDayName(date)}, ${date}
-      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); goToStart('${contentId}')">Ráno</button>
-      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '12:00')">Poledne</button>
-      <button class="btn" style="padding:4px 8px;font-size:.85em" onclick="event.stopPropagation(); centerTime('${contentId}', '23:00')">Půlnoc</button>
-      <span class="tiny-help">(Kliknutím na den sbalíš/rozbalíš)</span>`;
+    leftPart.innerHTML = `${getDayName(date)}, ${date}
+  <button class=\"btn\" style=\"padding:4px 8px;font-size:.85em\" onclick=\"event.stopPropagation(); goToStart('${contentId}')\">Ráno</button>
+  <button class=\"btn\" style=\"padding:4px 8px;font-size:.85em\" onclick=\"event.stopPropagation(); centerTime('${contentId}', '12:00')\">Poledne</button>
+  <button class=\"btn\" style=\"padding:4px 8px;font-size:.85em\" onclick=\"event.stopPropagation(); centerTime('${contentId}', '23:00')\">Půlnoc</button>`;
 
     const tabs = document.createElement('div');
     tabs.className='mode-tabs';
@@ -730,9 +1129,9 @@ async function fetchForecast(lat,lon){
     });
 
     header.appendChild(leftPart);
-    header.appendChild(tabs);
-    header.onclick=()=>toggleForecast(contentId);
-    section.appendChild(header);
+/* tabs removed */
+/* collapse disabled */
+section.appendChild(header);
 
     const content=document.createElement('div'); content.className='forecast-content'; content.id=contentId; content.style.display='block';
     const wrapper=document.createElement('div'); wrapper.className='forecast-scroll-wrapper';
@@ -797,58 +1196,10 @@ function changeGraphMode(contentId, mode){
   }
 }
 
-/* ===== Planets @22:00 ===== */
-async function fetchPlanets(lat,lon){
-  const box=$("planets-list"); const log=(m)=>$("planet-log").textContent=m;
-  box.innerHTML=""; log("počítám…");
-  const render = (list) => {
-    box.innerHTML="";
-    let any=false;
-    for(const p of list){
-      if(Number.isFinite(p.alt)&&p.alt>5){
-        const el=document.createElement("span"); el.className="pill"; el.title=`Azimut ${p.az.toFixed(0)}° v 22:00`; el.textContent=`${p.label}: ${p.alt.toFixed(0)}°`; box.appendChild(el); any=true;
-      }
-    }
-    if(!any) box.innerHTML = `<span class="small">Žádné planety nejsou dobře viditelné v 22:00.</span>`;
-    log("");
-    syncMapHeight();
-  };
-  try{
-    if(!window.Astronomy) throw new Error("Astronomy Engine nenačten");
-    const Body=window.Astronomy.Body;
-    const mapEnum = {Mercury:Body.Mercury, Venus:Body.Venus, Mars:Body.Mars, Jupiter:Body.Jupiter, Saturn:Body.Saturn, Uranus:Body.Uranus, Neptune:Body.Neptune};
-    const now=new Date(); const t=new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0);
-    const obs=new window.Astronomy.Observer(lat, lon, 0);
-    const names=[["Mercury","Merkur"],["Venus","Venuše"],["Mars","Mars"],["Jupiter","Jupiter"],["Saturn","Saturn"],["Uran","Uran"],["Neptune","Neptun"]];
-    const out=[];
-    for(const [eng, label] of names){
-      const hor=window.Astronomy.Horizontal(t, obs, mapEnum[eng], 'normal');
-      out.push({label, alt: hor.altitude, az: hor.azimuth});
-    }
-    render(out);
-  }catch(e){
-    try{
-      const url=`https://api.ipgeolocation.io/astronomy?apiKey=${IPGEO_API_KEY}&lat=${lat}&long=${lon}`;
-      const r=await fetch(url); const d=await r.json();
-      const out=[
-        {label:"Merkur", alt:+d.mercury_altitude, az:+d.mercury_azimuth},
-        {label:"Venuše", alt:+d.venus_altitude,   az:+d.venus_azimuth},
-        {label:"Mars",   alt:+d.mars_altitude,    az:+d.mars_azimuth},
-        {label:"Jupiter",alt:+d.jupiter_altitude, az:+d.jupiter_azimuth},
-        {label:"Saturn", alt:+d.saturn_altitude,  az:+d.saturn_azimuth},
-        {label:"Uran",   alt:+d.uranus_altitude,  az:+d.uranus_azimuth},
-        {label:"Neptun", alt:+d.neptune_altitude, az:+d.neptune_azimuth}
-      ];
-      render(out);
-    }catch(err){
-      box.innerHTML=`<span class="small">Chyba načítání planet.</span>`; log("");
-    }
-  }
-}
-
+/* ===== Layout sync ===== */
 window.addEventListener('load', syncMapHeight);
 
-/* ===== RainViewer overlays: radar + IR clouds ===== */
+/* ===== RainViewer overlays: radar + IR clouds (MODIFIED) ===== */
 let rvState = {
   host: 'https://tilecache.rainviewer.com',
   radarPath: null,
@@ -907,20 +1258,8 @@ function ensureRvLayers(){
     }
   }
 
-  // add layer control once
-  if(!rvState.control){
-    const overlays = {};
-    if(rvState.satLayer) overlays['☁️ Oblačnost (IR)'] = rvState.satLayer;
-    if(rvState.radarLayer) overlays['🌧️ Srážkový radar'] = rvState.radarLayer;
-    rvState.control = L.control.layers({}, overlays, { collapsed: false, position: 'topleft' }).addTo(map);
-  } else {
-    // update existing control (Leaflet has no direct API to refresh; simple approach: remove/add control)
-    map.removeControl(rvState.control);
-    const overlays = {};
-    if(rvState.satLayer) overlays['☁️ Oblačnost (IR)'] = rvState.satLayer;
-    if(rvState.radarLayer) overlays['🌧️ Srážkový radar'] = rvState.radarLayer;
-    rvState.control = L.control.layers({}, overlays, { collapsed: false, position: 'topleft' }).addTo(map);
-  }
+  // Místo toho se volá nová funkce, která kombinuje základní mapy a překryvy
+  addLayerControl();
 }
 
 async function refreshWeatherLayers(){
