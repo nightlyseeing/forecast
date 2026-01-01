@@ -315,6 +315,297 @@
   .mode-tabs{ flex-wrap:wrap; }
 }
 </style>
+
+<style>
+/* === Planet visibility widget (integrated) === */
+#planet-widget{
+  --pw-bg: rgba(0,0,0,.14);
+  --pw-line: rgba(255,255,255,.10);
+  --pw-text: #e8ecff;
+  --pw-muted: #aab2d6;
+  --pw-good:#8af0a4;
+  --pw-warn:#ffd36a;
+  --pw-bad:#ff7a7a;
+  --pw-shadow: 0 14px 38px rgba(0,0,0,.35);
+  --pw-radius: 14px;
+  --pw-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+#planet-widget .pw-panel{
+  margin-top:12px;
+  background: rgba(0,0,0,.12);
+  border:1px solid var(--pw-line);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+#planet-widget .pw-hdr{
+  padding: 12px 12px 10px 12px;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  justify-content:space-between;
+  border-bottom:1px solid var(--pw-line);
+  background: rgba(0,0,0,.10);
+}
+#planet-widget .pw-title{
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+}
+#planet-widget .pw-title h2{
+  margin:0;
+  font-size: 14px;
+  letter-spacing:.2px;
+  color:#fff;
+}
+#planet-widget .pw-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--pw-line);
+  color: var(--pw-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+#planet-widget .pw-sub{
+  margin-top:4px;
+  font-size: 12px;
+  color: var(--pw-muted);
+  line-height:1.35;
+}
+#planet-widget .pw-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-end;
+}
+#planet-widget .pw-controls label{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  color: var(--pw-muted);
+  font-size: 12px;
+  user-select:none;
+}
+#planet-widget .pw-body{ padding: 10px 12px 12px 12px; }
+#planet-widget .pw-statusRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 10px;
+}
+#planet-widget .pw-status{
+  font-family: var(--pw-mono);
+  font-size: 11px;
+  color: var(--pw-muted);
+}
+#planet-widget .pw-grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 768px){
+  #planet-widget .pw-grid{ grid-template-columns: 1fr; }
+  #planet-widget .pw-controls{ justify-content:flex-start; }
+}
+
+#planet-widget .pw-card{
+  background: rgba(0,0,0,.14);
+  border:1px solid var(--pw-line);
+  border-radius: 12px;
+  padding: 10px;
+  overflow:hidden;
+}
+#planet-widget .pw-rowTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+#planet-widget .pw-planet{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width: 0;
+}
+#planet-widget .pw-icon{
+  width: 32px; height: 32px;
+  display:grid; place-items:center;
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--pw-line);
+  flex: 0 0 auto;
+  font-size: 18px;
+}
+#planet-widget .pw-name{
+  display:flex;
+  flex-direction:column;
+  min-width: 0;
+}
+#planet-widget .pw-name strong{
+  font-size: 14px;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#planet-widget .pw-name span{
+  color: var(--pw-muted);
+  font-size: 11px;
+  margin-top: 2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+#planet-widget .pw-const{
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+}
+#planet-widget .pw-chip{
+  font-family: var(--pw-mono);
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border:1px solid var(--pw-line);
+  background: rgba(255,255,255,.05);
+  color: var(--pw-muted);
+  white-space:nowrap;
+  flex: 0 0 auto;
+}
+#planet-widget .pw-chip.good{ color: #dfffe8; border-color: rgba(138,240,164,.35); background: rgba(138,240,164,.10); }
+#planet-widget .pw-chip.warn{ color: #fff2d0; border-color: rgba(255,211,106,.35); background: rgba(255,211,106,.10); }
+#planet-widget .pw-chip.bad{  color: #ffd9d9; border-color: rgba(255,122,122,.35); background: rgba(255,122,122,.10); }
+
+#planet-widget .pw-meter{
+  position: relative;
+  height: 20px;
+  border-radius: 999px;
+  border:1px solid var(--pw-line);
+  background: linear-gradient(90deg,
+    rgba(255,122,122,.20),
+    rgba(255,211,106,.18) 40%,
+    rgba(138,240,164,.20) 70%);
+  overflow:hidden;
+}
+#planet-widget .pw-meter .horizon{
+  position:absolute;
+  left: 50%;
+  top:0; bottom:0;
+  width: 1px;
+  background: rgba(255,255,255,.22);
+  opacity:.85;
+}
+#planet-widget .pw-meter .tick{
+  position:absolute;
+  top:0; bottom:0;
+  width: 1px;
+  background: rgba(255,255,255,.10);
+}
+#planet-widget .pw-meter .tick.t1{ left: 25%; }
+#planet-widget .pw-meter .tick.t2{ left: 75%; }
+#planet-widget .pw-meter .dot{
+  position:absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 99px;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 10px 20px rgba(0,0,0,.35);
+  border: 2px solid rgba(0,0,0,.35);
+}
+#planet-widget .pw-meter .dot::after{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,.25), transparent 60%);
+  pointer-events:none;
+}
+
+#planet-widget .pw-meta{
+  display:flex;
+  gap:8px;
+  margin-top: 8px;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  color: var(--pw-muted);
+  font-size: 11px;
+}
+#planet-widget .pw-kv{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  font-family: var(--pw-mono);
+  font-size: 11px;
+  padding: 5px 7px;
+  border-radius: 12px;
+  border:1px solid var(--pw-line);
+  background: rgba(255,255,255,.04);
+  white-space:nowrap;
+}
+
+/* Tooltip */
+#planet-widget .pw-tooltip{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#planet-widget [data-tip]{ cursor: help; }
+#planet-widget [data-tip]::after{
+  content: attr(data-tip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  min-width: 220px;
+  max-width: 360px;
+  padding: 10px 11px;
+  border-radius: 12px;
+  background: rgba(12, 18, 38, .96);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 14px 38px rgba(0,0,0,.38);
+  color: #e8ecff;
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .12s ease, transform .12s ease;
+  z-index: 20;
+}
+#planet-widget [data-tip]::before{
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: calc(100% + 4px);
+  width: 0; height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid rgba(12, 18, 38, .96);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .12s ease, transform .12s ease;
+  z-index: 21;
+}
+#planet-widget [data-tip]:hover::after,
+#planet-widget [data-tip]:hover::before{
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+
 </head>
 <body>
 
@@ -398,6 +689,7 @@
 
           <div style="margin-top:8px;">
             <div><strong>🌕 Fáze Měsíce:</strong> <span id="moon-phase-label">—</span></div>
+            <div class="small" style="margin-top:4px;"><strong>✨ Osvětlení Měsíce:</strong> <span id="moon-illum-label">—</span></div>
           </div>
 
           <!-- NOVÝ WIDGET: Slunce & Měsíc -->
@@ -452,6 +744,40 @@
                 <div class="astro-alt" id="moon-alt-label">Výška: —</div>
               </div>
 
+            </div>
+          </div>
+
+
+          <!-- NOVÝ WIDGET: Viditelnost planet -->
+          <div id="planet-widget" class="astro-widget">
+            <div class="pw-panel">
+              <div class="pw-hdr">
+                <div style="min-width:0">
+                  <div class="pw-title">
+                    <h2>🪐 Viditelnost planet</h2>
+                    <span class="pw-badge" id="pw-observer-label">Pozorovatel: Praha</span>
+                    <span class="pw-tooltip">
+                      <span class="astro-info-icon" data-tip="Planety nad/pod obzorem pro zadané souřadnice. Hodnocení je orientační: výška nad obzorem + jasnost (magnituda). Data: api.visibleplanets.dev.">i</span>
+                    </span>
+                  </div>
+                  <div class="pw-sub">Planety se aktualizují po vyhledání místa (používá stejné souřadnice jako Slunce/Měsíc).</div>
+                </div>
+                <div class="pw-controls">
+                  <label title="Zobrazit i objekty pod obzorem">
+                    <input type="checkbox" id="pw-show-below" />
+                    ukázat i pod obzorem
+                  </label>
+                </div>
+              </div>
+
+              <div class="pw-body">
+                <div class="pw-statusRow">
+                  <div class="pw-status" id="pw-status">Připraveno.</div>
+                  <div class="pw-status" id="pw-meta"></div>
+                </div>
+
+                <div class="pw-grid" id="pw-grid"></div>
+              </div>
             </div>
           </div>
 
@@ -536,7 +862,48 @@ window.addEventListener("resize", syncMapHeight);
 
 /* ===== Geocoding & selection ===== */
 let selectedCity=null;
-async function autocompleteCities(){const v=$("cityInput").value.trim();const s=$("suggestions");if(v.length<2){s.style.display="none";return}const res=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);const data=await res.json();s.innerHTML="";(data.results||[]).forEach(c=>{const li=document.createElement("li");li.textContent=`${c.name}, ${c.country}`;li.onclick=()=>{selectedCity=c;$("cityInput").value=`${c.name}, ${c.country}`;updateLocationInfo(c);initMap(c.latitude,c.longitude);fetchForecast(c.latitude,c.longitude);fetchMoonPhase(c.latitude,c.longitude);showGlobalTabs(true);s.style.display="none"};s.appendChild(li)});s.style.display=s.children.length?"block":"none"}
+let _acTimer = null;
+async function autocompleteCities(){
+  const v = $("cityInput").value.trim();
+  const s = $("suggestions");
+  if(_acTimer) clearTimeout(_acTimer);
+
+  if(v.length < 2){
+    s.style.display = "none";
+    return;
+  }
+
+  // debounce to reduce API calls while typing
+  _acTimer = setTimeout(async ()=>{
+    try{
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(v)}&count=6&language=cs&format=json`);
+      const data = await res.json();
+      s.innerHTML = "";
+      (data.results||[]).forEach(c=>{
+        const li=document.createElement("li");
+        li.textContent=`${c.name}, ${c.country}`;
+        li.onclick=()=>{
+          selectedCity=c;
+          $("cityInput").value=`${c.name}, ${c.country}`;
+          updateLocationInfo(c);
+          initMap(c.latitude,c.longitude);
+          fetchForecast(c.latitude,c.longitude);
+          fetchMoonPhase(c.latitude,c.longitude);
+          window.__lastObserverLatLon = {lat:c.latitude, lon:c.longitude};
+          if(window.setObserverLocation){ window.setObserverLocation(c.latitude, c.longitude, c.name); }
+          showGlobalTabs(true);
+          s.style.display="none";
+        };
+        s.appendChild(li);
+      });
+      s.style.display = s.children.length ? "block" : "none";
+    }catch(e){
+      console.warn("Autocomplete failed", e);
+      s.style.display = "none";
+    }
+  }, 220);
+}
+
 
 async function getLocation(){
   if(!navigator.geolocation)return alert("Váš prohlížeč nepodporuje geolokaci.");
@@ -549,6 +916,8 @@ async function getLocation(){
     initMap(lat,lon);
     fetchForecast(lat,lon);
     fetchMoonPhase(lat,lon);
+    window.__lastObserverLatLon = {lat:lat, lon:lon};
+    if(window.setObserverLocation){ window.setObserverLocation(lat, lon, name || 'Moje poloha'); }
     showGlobalTabs(true);
     /* NOVĚ: po kliknutí na Moje poloha vyčistit vstup i návrhy */
     const input=$("cityInput"); if(input) input.value="";
@@ -703,62 +1072,163 @@ function astroFormatDegrees(rad){
   return deg.toFixed(1).replace(".", ",") + "°";
 }
 
-function astroBuildCurve(body, pathAboveEl, pathBelowEl, lat, lon){
-  if(!window.SunCalc || !pathAboveEl || !pathBelowEl) return;
+function astroBuildStaticSine(pathAboveEl, pathBelowEl){
+  // Builds a *static* sinusoid that never changes with location.
+  // Only the dot position changes based on rise/set times.
+  if(!pathAboveEl || !pathBelowEl) return;
 
-  const now = new Date();
-  const midnight = new Date(now);
-  midnight.setHours(0,0,0,0);
+  const steps = 200;
+  let aboveD = "";
+  let belowD = "";
 
-  const steps = 120;
-  let pathAbove = "";
-  let pathBelow = "";
-  let lastAbove = null;
+  for(let i=0;i<=steps;i++){
+    const t = i/steps; // 0..1
+    const x = ASTRO_MIN_X + t*(ASTRO_MAX_X - ASTRO_MIN_X);
+    const y = ASTRO_BASELINE_Y - Math.sin(2*Math.PI*t) * ASTRO_AMPLITUDE;
 
-  for(let i = 0; i <= steps; i++){
-    const frac = i / steps;
-    const time = new Date(midnight.getTime() + frac * ASTRO_MS_PER_DAY);
+    const isAbove = y <= ASTRO_BASELINE_Y + 1e-6; // numerical tolerance
+    const cmd = (i===0 ? "M" : "L");
 
-    let altitude;
-    let t;
-
-    if(body === "sun"){
-      // Slunce – osa X jde normálně od půlnoci do půlnoci
-      const pos = SunCalc.getPosition(time, lat, lon);
-      altitude = pos.altitude;
-      t = frac;
-    } else {
-      // Měsíc – používáme stejnou časovou osu jako pro Slunce,
-      // bez posunu a bez skoků v X souřadnici
-      const pos = SunCalc.getMoonPosition(time, lat, lon);
-      altitude = pos.altitude;
-      t = frac;
+    if(isAbove){
+      aboveD += ` ${cmd} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }else{
+      belowD += ` ${cmd} ${x.toFixed(2)} ${y.toFixed(2)}`;
     }
-
-    const point = astroAltitudeToPoint(t, altitude);
-    const above = altitude >= 0;
-
-    if(above){
-      if(lastAbove !== true){
-        pathAbove += ` M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-      } else {
-        pathAbove += ` L ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-      }
-    } else {
-      if(lastAbove !== false){
-        pathBelow += ` M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-      } else {
-        pathBelow += ` L ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-      }
-    }
-
-    lastAbove = above;
   }
 
-  pathAboveEl.setAttribute("d", pathAbove.trim());
-  pathBelowEl.setAttribute("d", pathBelow.trim());
+  // Split into two continuous paths (above/below). We rebuild with separate M/L segments.
+  function normalizePath(d, isAbove){
+    const pts = d.trim().split(/\s+[ML]\s+/).filter(Boolean);
+    // The split logic above can leave an initial point without command; rebuild robustly:
+    const coords = [];
+    for(const part of pts){
+      const m = part.trim().match(/^(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/);
+      if(m) coords.push([m[1], m[2]]);
+    }
+    if(coords.length === 0) return "";
+    let out = `M ${coords[0][0]} ${coords[0][1]}`;
+    for(let j=1;j<coords.length;j++){
+      out += ` L ${coords[j][0]} ${coords[j][1]}`;
+    }
+    return out;
+  }
+
+  // The simple builder above already separated points, but commands were mixed.
+  // Rebuild by sampling again with segment starts on horizon crossings.
+  aboveD = "";
+  belowD = "";
+  let lastAbove = null;
+  for(let i=0;i<=steps;i++){
+    const t = i/steps;
+    const x = ASTRO_MIN_X + t*(ASTRO_MAX_X - ASTRO_MIN_X);
+    const y = ASTRO_BASELINE_Y - Math.sin(2*Math.PI*t) * ASTRO_AMPLITUDE;
+    const isAbove = y <= ASTRO_BASELINE_Y + 1e-6;
+
+    if(isAbove){
+      aboveD += (lastAbove === true ? " L " : " M ") + `${x.toFixed(2)} ${y.toFixed(2)}`;
+    }else{
+      belowD += (lastAbove === false ? " L " : " M ") + `${x.toFixed(2)} ${y.toFixed(2)}`;
+    }
+    lastAbove = isAbove;
+  }
+
+  pathAboveEl.setAttribute("d", aboveD.trim());
+  pathBelowEl.setAttribute("d", belowD.trim());
 }
 
+// Compute last/next rise and the sunset in between (for dot mapping)
+function astroGetCycleTimesSun(now, lat, lon){
+  if(!window.SunCalc) return null;
+
+  const oneDay = 24*60*60*1000;
+  const d0 = new Date(now); d0.setHours(12,0,0,0); // midday avoids DST edge cases
+  const dPrev = new Date(d0.getTime() - oneDay);
+  const dNext = new Date(d0.getTime() + oneDay);
+
+  const tPrev = SunCalc.getTimes(dPrev, lat, lon);
+  const t0    = SunCalc.getTimes(d0,   lat, lon);
+  const tNext = SunCalc.getTimes(dNext, lat, lon);
+
+  const rises = [tPrev.sunrise, t0.sunrise, tNext.sunrise].filter(x => x instanceof Date && !isNaN(x));
+  const sets  = [tPrev.sunset,  t0.sunset,  tNext.sunset ].filter(x => x instanceof Date && !isNaN(x));
+
+  if(!rises.length || !sets.length) return null;
+
+  // last rise before now, next rise after now
+  const lastRise = rises.filter(r => r.getTime() <= now.getTime()).sort((a,b)=>b-a)[0];
+  const nextRise = rises.filter(r => r.getTime() >  now.getTime()).sort((a,b)=>a-b)[0] || new Date(lastRise.getTime()+oneDay);
+
+  // sunset between lastRise and nextRise
+  const sunset = sets.filter(s => s.getTime() > lastRise.getTime() && s.getTime() < nextRise.getTime()).sort((a,b)=>a-b)[0] || null;
+
+  return { lastRise, nextRise, sunset };
+}
+
+function astroGetCycleTimesMoon(now, lat, lon){
+  if(!window.SunCalc) return null;
+
+  const oneDay = 24*60*60*1000;
+  const d0 = new Date(now); d0.setHours(12,0,0,0);
+  const dPrev = new Date(d0.getTime() - oneDay);
+  const dNext = new Date(d0.getTime() + oneDay);
+
+  const pPrev = SunCalc.getMoonTimes(dPrev, lat, lon);
+  const p0    = SunCalc.getMoonTimes(d0,   lat, lon);
+  const pNext = SunCalc.getMoonTimes(dNext, lat, lon);
+
+  // Handle polar cases
+  if(p0.alwaysUp || p0.alwaysDown){
+    return { alwaysUp: !!p0.alwaysUp, alwaysDown: !!p0.alwaysDown };
+  }
+
+  const rises = [pPrev.rise, p0.rise, pNext.rise].filter(x => x instanceof Date && !isNaN(x));
+  const sets  = [pPrev.set,  p0.set,  pNext.set ].filter(x => x instanceof Date && !isNaN(x));
+
+  if(!rises.length || !sets.length) return null;
+
+  const lastRise = rises.filter(r => r.getTime() <= now.getTime()).sort((a,b)=>b-a)[0];
+  const nextRise = rises.filter(r => r.getTime() >  now.getTime()).sort((a,b)=>a-b)[0] || new Date(lastRise.getTime()+oneDay);
+  const moonset = sets.filter(s => s.getTime() > lastRise.getTime() && s.getTime() < nextRise.getTime()).sort((a,b)=>a-b)[0] || null;
+
+  return { lastRise, nextRise, moonset };
+}
+
+function astroTFromCycle(now, cycle){
+  // Maps "now" to a t in [0..1) on a static sine:
+  // 0   = rise, 0.5 = set, 1 = next rise
+  const oneDay = 24*60*60*1000;
+
+  if(!cycle || cycle.alwaysUp || cycle.alwaysDown){
+    // fallback: real clock time
+    return astroDayFraction(now);
+  }
+
+  const lastRise = cycle.lastRise;
+  const nextRise = cycle.nextRise || new Date(lastRise.getTime() + oneDay);
+  const setTime = cycle.sunset || cycle.moonset;
+
+  const span = Math.max(60*1000, nextRise.getTime() - lastRise.getTime()); // avoid divide-by-zero
+  const raw = (now.getTime() - lastRise.getTime()) / span;
+  const frac = Math.min(0.999999, Math.max(0, raw));
+
+  if(setTime && setTime.getTime() > lastRise.getTime() && setTime.getTime() < nextRise.getTime()){
+    const daySpan = Math.max(60*1000, setTime.getTime() - lastRise.getTime());
+    const nightSpan = Math.max(60*1000, nextRise.getTime() - setTime.getTime());
+    if(now.getTime() < setTime.getTime()){
+      return (now.getTime() - lastRise.getTime()) / daySpan * 0.5;
+    }
+    return 0.5 + (now.getTime() - setTime.getTime()) / nightSpan * 0.5;
+  }
+
+  // if no set available, linear through the whole cycle
+  return frac;
+}
+
+function astroPointOnStaticSine(t){
+  const x = ASTRO_MIN_X + t * (ASTRO_MAX_X - ASTRO_MIN_X);
+  const y = ASTRO_BASELINE_Y - Math.sin(2*Math.PI*t) * ASTRO_AMPLITUDE;
+  return { x, y };
+}
 
 function updateAstroWidget(){
   if(!window.SunCalc || !sunDotEl || !moonDotEl) return;
@@ -766,25 +1236,31 @@ function updateAstroWidget(){
   const now = new Date();
   const { lat, lon } = astroState;
 
-  const tNowSun  = astroDayFraction(now);
-  const tNowMoon = astroDayFraction(now);
+  // Build static curves once (never change with location)
+  if(!window.__astroStaticBuilt){
+    astroBuildStaticSine(sunPathAboveEl, sunPathBelowEl);
+    astroBuildStaticSine(moonPathAboveEl, moonPathBelowEl);
+    window.__astroStaticBuilt = true;
+  }
 
-  // SLUNCE
-  astroBuildCurve("sun", sunPathAboveEl, sunPathBelowEl, lat, lon);
+  // SUN: map dot along static sine using sunrise/sunset cycle
+  const sunCycle = astroGetCycleTimesSun(now, lat, lon);
+  const tSun = astroTFromCycle(now, sunCycle);
+  const sunPt = astroPointOnStaticSine(tSun);
+  sunDotEl.setAttribute("cx", sunPt.x);
+  sunDotEl.setAttribute("cy", sunPt.y);
   const sunPos = SunCalc.getPosition(now, lat, lon);
-  const sunPointNow = astroAltitudeToPoint(tNowSun, sunPos.altitude);
-  sunDotEl.setAttribute("cx", sunPointNow.x);
-  sunDotEl.setAttribute("cy", sunPointNow.y - 1);
   if(sunAltLabel){
     sunAltLabel.textContent = "Výška: " + astroFormatDegrees(sunPos.altitude);
   }
 
-  // MĚSÍC
-  astroBuildCurve("moon", moonPathAboveEl, moonPathBelowEl, lat, lon);
+  // MOON: same mapping via moonrise/moonset cycle (fallback for polar cases)
+  const moonCycle = astroGetCycleTimesMoon(now, lat, lon);
+  const tMoon = astroTFromCycle(now, moonCycle);
+  const moonPt = astroPointOnStaticSine(tMoon);
+  moonDotEl.setAttribute("cx", moonPt.x);
+  moonDotEl.setAttribute("cy", moonPt.y);
   const moonPos = SunCalc.getMoonPosition(now, lat, lon);
-  const moonPointNow = astroAltitudeToPoint(tNowMoon, moonPos.altitude);
-  moonDotEl.setAttribute("cx", moonPointNow.x);
-  moonDotEl.setAttribute("cy", moonPointNow.y - 1);
   if(moonAltLabel){
     moonAltLabel.textContent = "Výška: " + astroFormatDegrees(moonPos.altitude);
   }
@@ -813,6 +1289,24 @@ async function fetchMoonPhase(lat,lon){
     // Moon Phase
     const p=d.moon_phase||"Neznámá fáze";
     $("moon-phase-label").textContent=getMoonEmojiFromName(p);
+    // Moon illumination (%) - field name differs across API versions:
+    // - moon_illumination_percentage (docs) or moon_illumination (older)
+    const illumRaw =
+      (d.moon_illumination_percentage ?? d.moon_illumination ??
+       (d.astronomy && (d.astronomy.moon_illumination_percentage ?? d.astronomy.moon_illumination)));
+
+    // Normalize to number (0..100)
+    let illumPct = null;
+    if(illumRaw != null && illumRaw !== ""){
+      const s = String(illumRaw).trim().replace("%","");
+      const n = Number(s);
+      if(!Number.isNaN(n)) illumPct = n;
+    }
+
+    const illumStr = (illumPct != null) ? (Math.round(illumPct) + "%") : "—";
+    const illumEl = document.getElementById("moon-illum-label");
+    if(illumEl) illumEl.textContent = illumStr;
+
 
     // Sun Times (Sunrise/Sunset)
     const sunRise = d.sunrise ? d.sunrise.substring(0, 5) : '—';
@@ -827,13 +1321,14 @@ async function fetchMoonPhase(lat,lon){
     $("moon-set-label").textContent = moonSet;
 
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Prague' });
-    const illumPct = Number(d.moon_illumination);
-    if(Number.isFinite(illumPct)){
-      moonIllumByDate[today] = Math.max(0, Math.min(1, illumPct/100));
-    }
-  }catch(e){
+// Store illumination for 'today' so the widget can draw correctly (0..1)
+moonIllumByDate[today] = (illumPct != null) ? Math.max(0, Math.min(1, illumPct / 100)) : 0;
+
+}catch(e){
     console.error("Chyba při načítání fáze/slunce/měsíce:",e);
     $("moon-phase-label").textContent="Chyba načítání";
+    const illumEl = document.getElementById("moon-illum-label");
+    if(illumEl) illumEl.textContent = "—";
     $("sun-rise-label").textContent = "—";
     $("sun-set-label").textContent = "—";
     $("moon-rise-label").textContent = "—";
@@ -1411,5 +1906,175 @@ function changeAllGraphModes(mode){
   window.addEventListener('orientationchange', function(){ setTimeout(function(){ if(isSmall()) fixMapMobileHeight(); }, 250); });
 })();
 </script>
+
+<script>
+/* ===== Planet visibility widget (visibleplanets.dev) ===== */
+(function(){
+  const ICONS = { Mercury:"☿", Venus:"♀", Earth:"⊕", Mars:"♂", Jupiter:"♃", Saturn:"♄", Uranus:"⛢", Neptune:"♆", Pluto:"♇", Moon:"☾", Sun:"☉" };
+  const CONST_GLYPHS = { Aries:"♈", Taurus:"♉", Gemini:"♊", Cancer:"♋", Leo:"♌", Virgo:"♍", Libra:"♎", Scorpio:"♏", Sagittarius:"♐", Capricorn:"♑", Aquarius:"♒", Pisces:"♓", Capricornus:"♑" };
+
+  const $ = (id)=>document.getElementById(id);
+
+  function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+  function fmt(n, digits=1){
+    if(n===null || n===undefined || Number.isNaN(Number(n))) return "—";
+    return Number(n).toFixed(digits);
+  }
+  function altitudeToPct(alt){
+    const a = clamp(Number(alt), -90, 90);
+    return (a + 90) / 180 * 100;
+  }
+  function azToCompass(az){
+    if(az===null || az===undefined || Number.isNaN(Number(az))) return "—";
+    const dirs = ["N","NE","E","SE","S","SW","W","NW","N"];
+    const i = Math.round(Number(az)/45);
+    return dirs[clamp(i,0,8)];
+  }
+  function qualityChip(alt, mag){
+    const a = Number(alt);
+    const m = (mag===null || mag===undefined || Number.isNaN(Number(mag))) ? null : Number(mag);
+    if(a >= 25 && (m === null || m <= 2.5)) return {cls:"good", text:"dobrá"};
+    if(a >= 10 && (m === null || m <= 4.5)) return {cls:"warn", text:"možná"};
+    if(a >= 0) return {cls:"warn", text:"nízko"};
+    return {cls:"bad", text:"pod obzorem"};
+  }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  }
+  function getConstGlyph(name){
+    if(!name) return "✶";
+    const key = String(name).trim();
+    return CONST_GLYPHS[key] || "✶";
+  }
+
+  function makeCard(b){
+    const name = b?.name || "—";
+    const icon = ICONS[name] || "🪐";
+    const alt = Number(b?.altitude);
+    const az  = Number(b?.azimuth);
+    const mag = (b?.magnitude === null || b?.magnitude === undefined) ? null : Number(b?.magnitude);
+    const constel = b?.constellation || "—";
+    const chip = qualityChip(alt, mag);
+    const pct = altitudeToPct(alt);
+
+    const el = document.createElement("div");
+    el.className = "pw-card";
+    el.innerHTML = `
+      <div class="pw-rowTop">
+        <div class="pw-planet">
+          <div class="pw-icon">${icon}</div>
+          <div class="pw-name">
+            <strong>${escapeHtml(name)}</strong>
+            <span class="pw-const" title="Souhvězdí">
+              <span aria-hidden="true">${getConstGlyph(constel)}</span>
+              <span>${escapeHtml(constel)}</span>
+            </span>
+          </div>
+        </div>
+        <div class="pw-chip ${chip.cls}" title="Orientační hodnocení viditelnosti">${chip.text}</div>
+      </div>
+
+      <div class="pw-meter" title="Horizont je uprostřed. Vlevo = -90°, vpravo = +90° (zenit).">
+        <div class="tick t1"></div>
+        <div class="horizon" title="0° obzor"></div>
+        <div class="tick t2"></div>
+        <div class="dot" style="left:${pct}%;"></div>
+      </div>
+
+      <div class="pw-meta">
+        <div class="pw-kv" title="Výška nad obzorem">Alt: ${fmt(alt,1)}°</div>
+        <div class="pw-kv" title="Azimut (0°=sever, 90°=východ)">Az: ${fmt(az,0)}° ${azToCompass(az)}</div>
+        <div class="pw-kv" title="Zdánlivá hvězdná velikost (nižší = jasnější)">Mag: ${mag===null? "—" : fmt(mag,1)}</div>
+      </div>
+    `;
+    return el;
+  }
+
+  let lastAbort = null;
+
+  async function loadPlanets(lat, lon, opts={}){
+    const showBelow = !!opts.showBelow;
+    const label = opts.label || null;
+
+    if(label && $("pw-observer-label")) $("pw-observer-label").textContent = "Pozorovatel: " + label;
+
+    const url = new URL("https://api.visibleplanets.dev/v3");
+    url.searchParams.set("latitude", String(lat));
+    url.searchParams.set("longitude", String(lon));
+    url.searchParams.set("aboveHorizon", showBelow ? "false" : "true");
+
+    if(lastAbort) lastAbort.abort();
+    lastAbort = new AbortController();
+
+    if($("pw-status")) $("pw-status").textContent = "Načítám…";
+    if($("pw-meta")) $("pw-meta").textContent = "";
+    if($("pw-grid")) $("pw-grid").innerHTML = "";
+
+    try{
+      const t0 = performance.now();
+      const res = await fetch(url.toString(), { signal: lastAbort.signal });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      const t1 = performance.now();
+
+      const bodies = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      const meta = data?.meta || null;
+
+      const wanted = new Set(["Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune"]);
+      const filtered = bodies.filter(b => wanted.has(b?.name));
+
+      if($("pw-status")){
+        $("pw-status").textContent = filtered.length ? "Hotovo." : "Nenalezeny žádné planety (zkus „ukázat i pod obzorem“).";
+      }
+
+      filtered.sort((a,b)=> (Number(b.altitude)||-999) - (Number(a.altitude)||-999));
+      const frag = document.createDocumentFragment();
+      filtered.forEach(b => frag.appendChild(makeCard(b)));
+      if($("pw-grid")) $("pw-grid").appendChild(frag);
+
+      const metaParts = [];
+      if(meta?.engineVersion) metaParts.push("engine " + meta.engineVersion);
+      metaParts.push("API: visibleplanets");
+      metaParts.push("t=" + Math.round(t1 - t0) + "ms");
+      if($("pw-meta")) $("pw-meta").textContent = metaParts.join(" · ");
+    }catch(err){
+      if(err?.name === "AbortError") return;
+      console.error(err);
+      if($("pw-status")) $("pw-status").textContent = "Chyba načítání: " + (err?.message || err);
+      if($("pw-meta")) $("pw-meta").textContent = "";
+    }
+  }
+
+  // Public hook for the main page: call this after searching a place
+  window.setObserverLocation = function(lat, lon, label){
+    if($("pw-observer-label")) $("pw-observer-label").textContent = "Pozorovatel: " + (label || "—");
+    loadPlanets(lat, lon, { showBelow: $("pw-show-below")?.checked, label });
+  };
+
+  // UI: toggle below-horizon
+  $("pw-show-below")?.addEventListener("change", ()=>{
+    // try to reuse last known coords (from astroState if exists)
+    let lat = (window.astroState && Number(window.astroState.lat)) || 50.0755;
+    let lon = (window.astroState && Number(window.astroState.lon)) || 14.4378;
+    if(window.__lastObserverLatLon){
+      lat = window.__lastObserverLatLon.lat;
+      lon = window.__lastObserverLatLon.lon;
+    }
+    loadPlanets(lat, lon, { showBelow: $("pw-show-below").checked, label: (labelFromPage()||"—") });
+  });
+
+  function labelFromPage(){
+    const np = document.getElementById("nowPlace");
+    if(np && np.textContent && np.textContent.trim() !== "—") return np.textContent.trim();
+    const info = document.getElementById("info-name");
+    if(info && info.textContent) return info.textContent.trim().split(',')[0] || null;
+    return null;
+  }
+
+  // Initial default (Praha)
+  loadPlanets(50.0755, 14.4378, { showBelow: false, label: "Praha" });
+})();
+</script>
+
 </body>
 </html>
